@@ -37,7 +37,7 @@ void GameScene::Update(void)
 void GameScene::Draw(void)
 {
 	
-	
+	DrawString(0, 100, "Game Scene", 0x000000);
 }
 
 

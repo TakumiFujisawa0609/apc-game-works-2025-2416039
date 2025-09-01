@@ -2,6 +2,8 @@
 #include <DxLib.h>
 #include <EffekseerForDXLib.h>
 #include "../Common/Fader.h"
+#include "../Object/Camera/Camera.h"
+#include "../Object/Grid/Grid.h"
 #include "../Scene/TitleScene.h"
 #include "../Scene/GameScene.h"
 #include "ResourceManager.h"
@@ -29,8 +31,17 @@ void SceneManager::Init(void)
 	sceneId_ = SCENE_ID::TITLE;
 	waitSceneId_ = SCENE_ID::NONE;
 
+	//カメラ機能の初期化
+	camera_ = new Camera();
 
+	//グリッド機能の初期化
+	grid_ = new Grid();
+	// フェード機能の初期化
 	fader_ = std::make_unique<Fader>();
+
+	//Init
+	camera_->Init();
+	grid_->Init();
 	fader_->Init();
 
 	isSceneChanging_ = false;
@@ -110,6 +121,10 @@ void SceneManager::Draw(void)
 
 	// 画面を初期化
 	ClearDrawScreen();
+	// カメラ設定
+	camera_->SetBeforeDraw();
+	//グリッド線
+	grid_->Draw();
 
 	// Effekseerにより再生中のエフェクトを更新する。
 	UpdateEffekseer3D();
@@ -155,7 +170,7 @@ float SceneManager::GetDeltaTime(void) const
 	return deltaTime_;
 }
 
-std::weak_ptr<Camera> SceneManager::GetCamera(void) const
+Camera* SceneManager::GetCamera(void) const
 {
 	return camera_;
 }

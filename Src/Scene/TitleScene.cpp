@@ -40,6 +40,7 @@ void TitleScene::Update(void)
 
 void TitleScene::Draw(void)
 {
-	
+	DrawString(0, 100, "Title Scene", 0x000000);
+	DrawString(0, 130, "スベースでゲームに", 0x000000);
 }
 

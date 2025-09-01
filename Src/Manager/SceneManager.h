@@ -6,6 +6,8 @@
 #define mainCamera SceneManager::GetInstance().GetCamera().lock()
 
 class SceneBase;
+class Camera;
+class Grid;
 class Fader;
 class Camera;
 
@@ -51,7 +53,7 @@ public:
 	float GetDeltaTime(void) const;
 
 	// カメラの取得
-	std::weak_ptr<Camera> GetCamera(void) const;
+	Camera* GetCamera(void) const;
 
 private:
 
@@ -69,8 +71,11 @@ private:
 	// 各種シーン
 	std::unique_ptr<Fader> fader_;
 
-	// カメラ
-	std::shared_ptr<Camera> camera_;
+	//カメラ
+	Camera* camera_;
+
+	//グリッド線
+	Grid* grid_;
 
 	// シーン遷移中判定
 	bool isSceneChanging_;
