@@ -42,3 +42,11 @@
 Project/kadai3/.vs/
 Project/kadai3/x64/
 Project/kadai3/Log.txt
+
+# New addition
+.vs/
+x64/
+x86/
+Win32/
+Debug/
+Release/
