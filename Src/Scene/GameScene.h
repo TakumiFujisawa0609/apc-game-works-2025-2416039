@@ -3,6 +3,10 @@
 #include "../Common/Vector2.h"
 #include <vector>
 
+class Player;
+class Camera;
+class Grid;
+
 class GameScene : public SceneBase
 {
 
@@ -19,5 +23,15 @@ public:
 	void Draw(void) override;
 
 private:
+
+
+	//カメラ
+	Camera* camera_;
+
+	//グリッド線
+	Grid* grid_;
+
+	//プレイヤー
+	Player* player_;
 	
 };

@@ -1,6 +1,8 @@
 #include <EffekseerForDXLib.h>
 #include "../../Manager/InputManager.h"
 #include "../../Utility/AsoUtility.h"
+#include "../../Object/Player/Player.h"
+
 #include "Camera.h"
 Camera::Camera(void)
 {
@@ -13,12 +15,15 @@ Camera::Camera(void)
 Camera::~Camera()
 {
 }
-void Camera::Init(void)
+void Camera::Init(Player*player)
 {
+
+	player_ = player;
+
 	pos_ = DEFAULT_POS;
 	angles_ = DEFAULT_ANGLES;
 	// 定点カメラを初期状態にする
-	ChangeMode(MODE::FIXED_POINT);
+	ChangeMode(MODE::FREE);
 }
 void Camera::Update(void)
 {
@@ -82,6 +87,8 @@ void Camera::ChangeMode(MODE mode)
 
 void Camera::SetBeforeDrawFixedPoint(void)
 {
+	
+
 	pos_ = {0.0f,300.0f,-485.0f};
 	
 }
@@ -90,13 +97,9 @@ void Camera::SetBeforeDrawFree(void)
 {
 	auto& ins = InputManager::GetInstance();
 	// WASDでカメラの位置を変える
-	float movePow = 3.0f;
-	if (ins.IsNew(KEY_INPUT_W)) { pos_.z += movePow; }
-	if (ins.IsNew(KEY_INPUT_A)) { pos_.x -= movePow; }
-	if (ins.IsNew(KEY_INPUT_S)) { pos_.z -= movePow; }
-	if (ins.IsNew(KEY_INPUT_D)) { pos_.x += movePow; }
-	if (ins.IsNew(KEY_INPUT_Q)) { pos_.y += movePow; }
-	if (ins.IsNew(KEY_INPUT_E)) { pos_.y -= movePow; }
+	pos_.x=player_->GetPos().x;
+	pos_.y=player_->GetPos().y+500.0f;
+	pos_.z=player_->GetPos().z-1000.0f;
 	// 矢印キーでカメラの角度を変える
 	float rotPow = 1.0f * DX_PI_F / 180.0f;
 	if (ins.IsNew(KEY_INPUT_DOWN)) { angles_.x += rotPow; }

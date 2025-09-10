@@ -1,4 +1,5 @@
 #include <DxLib.h>
+#include "../../Utility/AsoUtility.h"
 #include "../../Manager/InputManager.h"
 #include "../../Manager/ResourceManager.h"
 #include "Player.h"
@@ -18,13 +19,13 @@ void Player::Init()
 	state_ = STATE::STANDBY;
 	ChangeState(state_);
 	//モデル読み込み
-	//model_ = ;
+	model_ = MV1LoadModel("Data/Model/無題.mv1");
 	// 初期位置
-	pos_ = { 0.0f, 0.0f, 0.0f };
+	pos_ = { 0.0f, 50.0f, 0.0f };
 	// 初期回転
 	rot_ = { 0.0f, 0.0f, 0.0f };
 	// 初期大きさ
-	scale_ = { 1.0f, 1.0f, 1.0f };
+	scale_ = { 0.5f, 0.5f, 0.5f };
 	
 	// 初期体力
 	hp_ = MAX_HP;
@@ -42,9 +43,7 @@ void Player::Init()
 void Player::ChangeStandby()
 {
 }
-void Player::ChangeMove()
-{
-}
+
 void Player::ChangeAvoid()
 {
 }
@@ -53,6 +52,7 @@ void Player::ChangeGuard()
 }
 void Player::ChangeParry()
 {
+	count_ = 0.0f;
 }
 void Player::ChangeDamage()
 {
@@ -67,9 +67,6 @@ void Player::Update()
 	{
 	case Player::STATE::STANDBY:
 		StandbyUpdate();
-		break;
-	case Player::STATE::MOVE:
-		MoveUpdate();
 		break;
 	case Player::STATE::AVOID:
 		AvoidUpdate();
@@ -89,23 +86,59 @@ void Player::Update()
 	default:
 		break;
 	}
+	MV1SetPosition(model_, pos_);
+	MV1SetRotationXYZ(model_, rot_);
 
 }
 // ステイトアプデ
 void Player::StandbyUpdate()
 {
+	auto& ins = InputManager::GetInstance();
+	Move();
+	if (ins.IsTrgDown(KEY_INPUT_LSHIFT))
+	{
+		ChangeState(STATE::AVOID);
+	}
+	if (ins.IsTrgDown(KEY_INPUT_SPACE))
+	{
+		ChangeState(STATE::GUARD);
+	}
+
+	
 }
-void Player::MoveUpdate()
-{
-}
+
 void Player::AvoidUpdate()
 {
+	rot_.x += AsoUtility::Deg2RadF(-20.0f);
+	AvoidMove();
+	
+	if (rot_.x <= AsoUtility::Deg2RadF(-360.0f))
+	{
+		rot_.x = 0.0f;
+		ChangeState(STATE::STANDBY);
+	}
 }
+
+	
 void Player::GuardUpdate()
 {
+	auto& ins = InputManager::GetInstance();
+	HalfMove();
+	if (ins.IsTrgUp(KEY_INPUT_SPACE))
+	{
+		ChangeState(STATE::PARRY);
+	}
 }
 void Player::ParryUpdate()
 {
+	count_ += 0.5f;
+	HalfMove();
+
+	if (count_ >= MAX_COUNT)
+	{
+		ChangeState(STATE::STANDBY);
+	}
+	
 }
 void Player::DamageUpdate()
 {
@@ -120,9 +153,6 @@ void Player::Draw()
 	{
 	case Player::STATE::STANDBY:
 		StandbyDraw();
-		break;
-	case Player::STATE::MOVE:
-		MoveDraw();
 		break;
 	case Player::STATE::AVOID:
 		AvoidDraw();
@@ -147,30 +177,34 @@ void Player::Draw()
 // ステイトドロー
 void Player::StandbyDraw()
 {
-}
-
-void Player::MoveDraw()
-{
+	MV1DrawModel(model_);
 }
 
 void Player::AvoidDraw()
 {
+	MV1DrawModel(model_);
 }
 
 void Player::GuardDraw()
 {
+	DrawSphere3D(pos_, 100.0f, 16, GetColor(0, 0, 255), GetColor(0, 0, 255), false);
+	MV1DrawModel(model_);
 }
 
 void Player::ParryDraw()
 {
+	DrawSphere3D(pos_, 120.0f, 16, GetColor(0, 0, 255), GetColor(0, 0, 255), false);
+	MV1DrawModel(model_);
 }
 
 void Player::DamageDraw()
 {
+	MV1DrawModel(model_);
 }
 
 void Player::DeadDraw()
 {
+	MV1DrawModel(model_);
 }
 // ステイトチェンジ
 void Player::ChangeState(STATE state)
@@ -180,9 +214,6 @@ void Player::ChangeState(STATE state)
 	{
 	case Player::STATE::STANDBY:
 		ChangeStandby();
-		break;
-	case Player::STATE::MOVE:
-		ChangeMove();
 		break;
 	case Player::STATE::AVOID:
 		ChangeAvoid();
@@ -204,40 +235,137 @@ void Player::ChangeState(STATE state)
 	}
 }
 
-// ゲッターセッター
+
+
+//機能＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+void Player::Move()
+{
+	InputManager& ins = InputManager::GetInstance();
+	//
+	VECTOR moveDir = AsoUtility::VECTOR_ZERO;
+	if (ins.IsNew(KEY_INPUT_W)) { moveDir = VAdd(moveDir, AsoUtility::DIR_F); }
+	if (ins.IsNew(KEY_INPUT_S)) { moveDir = VAdd(moveDir, AsoUtility::DIR_B); }
+	if (ins.IsNew(KEY_INPUT_A)) { moveDir = VAdd(moveDir, AsoUtility::DIR_L); }
+	if (ins.IsNew(KEY_INPUT_D)) { moveDir = VAdd(moveDir, AsoUtility::DIR_R); }
+
+	if (!AsoUtility::EqualsVZero(moveDir))
+	{
+		
+		moveDir = VNorm(moveDir);
+
+		moveDir_ = moveDir;
+		rot_.y = atan2(moveDir_.x, moveDir_.z) + DX_PI_F;
+
+		//
+		VECTOR movePos = VScale(moveDir_, MOVE_SPEED);
+		//
+		pos_ = VAdd(pos_, movePos);
+
+		//angles_.y = AsoUtility::Deg2RadF(180.0f);
+		MV1SetPosition(model_, pos_);
+
+		MV1SetRotationXYZ(model_, rot_);
+	}
+
+}
+void Player::HalfMove()
+{
+	InputManager& ins = InputManager::GetInstance();
+	//
+	VECTOR moveDir = AsoUtility::VECTOR_ZERO;
+	if (ins.IsNew(KEY_INPUT_W)) { moveDir = VAdd(moveDir, AsoUtility::DIR_F); }
+	if (ins.IsNew(KEY_INPUT_S)) { moveDir = VAdd(moveDir, AsoUtility::DIR_B); }
+	if (ins.IsNew(KEY_INPUT_A)) { moveDir = VAdd(moveDir, AsoUtility::DIR_L); }
+	if (ins.IsNew(KEY_INPUT_D)) { moveDir = VAdd(moveDir, AsoUtility::DIR_R); }
+
+	if (!AsoUtility::EqualsVZero(moveDir))
+	{
+
+		moveDir = VNorm(moveDir);
+
+		moveDir_ = moveDir;
+		rot_.y = atan2(moveDir_.x, moveDir_.z) + DX_PI_F;
+
+		//
+		VECTOR movePos = VScale(moveDir_, MOVE_SPEED_HALF);
+		//
+		pos_ = VAdd(pos_, movePos);
+
+		//angles_.y = AsoUtility::Deg2RadF(180.0f);
+		MV1SetPosition(model_, pos_);
+
+		MV1SetRotationXYZ(model_, rot_);
+	}
+
+}
+void Player::AvoidMove()
+{
+	InputManager& ins = InputManager::GetInstance();
+	//
+	VECTOR moveDir = AsoUtility::VECTOR_ZERO;
+	if (ins.IsNew(KEY_INPUT_W)) { moveDir = VAdd(moveDir, AsoUtility::DIR_F); }
+	if (ins.IsNew(KEY_INPUT_S)) { moveDir = VAdd(moveDir, AsoUtility::DIR_B); }
+	if (ins.IsNew(KEY_INPUT_A)) { moveDir = VAdd(moveDir, AsoUtility::DIR_L); }
+	if (ins.IsNew(KEY_INPUT_D)) { moveDir = VAdd(moveDir, AsoUtility::DIR_R); }
+
+	if (!AsoUtility::EqualsVZero(moveDir))
+	{
+
+		moveDir = VNorm(moveDir);
+
+		moveDir_ = moveDir;
+		rot_.y = atan2(moveDir_.x, moveDir_.z) + DX_PI_F;
+
+		//
+		VECTOR movePos = VScale(moveDir_, AVOID_SPEED);
+		//
+		pos_ = VAdd(pos_, movePos);
+
+		//angles_.y = AsoUtility::Deg2RadF(180.0f);
+		MV1SetPosition(model_, pos_);
+
+		MV1SetRotationXYZ(model_, rot_);
+	}
+
+}
+// ゲッターセッター＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 VECTOR Player::GetPos()
 {
-	return VECTOR();
+	return pos_;
 }
 
 void Player::SetPos(VECTOR pos)
 {
+	pos_ = pos;
 }
 
 int Player::GetHp()
 {
-	return 0;
+	return hp_;
 }
 
 void Player::SetHp(int hp)
 {
+	hp_ = hp;
 }
 
 int Player::GetSp()
 {
-	return 0;
+	return sp_;
 }
 
 void Player::SetSp(int sp)
 {
+	sp_ = sp;
 }
 
 int Player::GetGp()
 {
-	return 0;
+	return gp_;
 }
 
 void Player::SetGp(int gp)
 {
+	gp_ = gp;
 }
 

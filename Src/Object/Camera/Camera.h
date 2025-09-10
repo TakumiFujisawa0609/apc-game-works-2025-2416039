@@ -1,5 +1,8 @@
 #pragma once
 #include <DxLib.h>
+
+class Player;
+
 class Camera
 {
 public:
@@ -27,7 +30,7 @@ public:
 	// デストラクタ
 	~Camera(void);
 	// 初期化
-	void Init(void);
+	void Init(Player*player);
 	// 更新
 	void Update(void);
 	// 描画前のカメラ設定
@@ -53,5 +56,8 @@ private:
 	// カメラモード別の制御処理
 	void SetBeforeDrawFixedPoint(void);
 	void SetBeforeDrawFree(void);
+
+	// プレイヤーのポインタ
+	Player* player_;
 };
 
