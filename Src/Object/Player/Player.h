@@ -38,7 +38,10 @@ public:
 	static constexpr int MAX_SP = 100; //最大スタミナ
 	static constexpr int MAX_GP = 100; //最大ガード
 
-	static constexpr float MAX_COUNT = 5.0f;
+	static constexpr float MAX_COUNT = 5.0f; //カウントの最大値
+	
+	static constexpr float GUARD_RADIUS = 100.0f;//ガード時の半径
+	static constexpr float PARRY_RADIUS = 120.0f;//パリィ時の半径
 
 
 private:

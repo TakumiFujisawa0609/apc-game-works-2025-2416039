@@ -6,6 +6,8 @@
 #include "../Scene/GameScene.h"
 #include "ResourceManager.h"
 #include "SceneManager.h"
+#include "InputManager.h"
+#include "../Application.h"
 
 SceneManager* SceneManager::instance_ = nullptr;
 
@@ -82,6 +84,43 @@ void SceneManager::Init3D(void)
 void SceneManager::Update(void)
 {
 
+	// 入力マネージャのインスタンスを取得
+	InputManager& ins = InputManager::GetInstance();
+	Application& app = Application::GetInstance();
+
+	if (ins.IsTrgDown(KEY_INPUT_ESCAPE))
+	{
+		manew_ = true;
+
+	}
+	if (manew_ == true)
+	{
+		count_++;
+		if (ins.IsTrgDown(KEY_INPUT_RETURN))
+		{
+			app.SetExit(true);
+			count_ = 0;
+		}
+		if (sceneId_ != SCENE_ID::TITLE)
+		{
+			if (ins.IsTrgDown(KEY_INPUT_SPACE))
+			{
+				InitSoundMem();
+				DoChangeScene(SCENE_ID::TITLE);
+				manew_ = false;
+			}
+		}
+		if (count_ >= 2)
+		{
+			if (ins.IsTrgDown(KEY_INPUT_ESCAPE))
+			{
+				manew_ = false;
+				count_ = 0;
+			}
+		}
+
+	}
+
 	if (scene_ == nullptr)
 	{
 		return;
@@ -127,6 +166,23 @@ void SceneManager::Draw(void)
 	
 	// 暗転・明転
 	fader_->Draw();
+	if (manew_ == true)
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 / 1.1);
+		DrawBox(0, 0, Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		if (sceneId_ != SCENE_ID::TITLE)
+		{
+			SetFontSize(TEXT_SIZE_LARGE);
+			DrawFormatString(TEXT_POS_X, TEXT_POS_Y, 0xFFFFFF, "SPACEキーを押してタイトル\n\n    ENTERでゲーム終了\n\n　　　ESCで戻る");
+			SetFontSize(TEXT_SIZE_SMALL);
+		}
+		else {
+			SetFontSize(TEXT_SIZE_LARGE);
+			DrawFormatString(TEXT_POS_X, TEXT_POS_Y, 0xFFFFFF, "\n\n    ENTERでゲーム終了\n\n　　　ESCで戻る");
+			SetFontSize(TEXT_SIZE_SMALL);
+		}
+	}
 
 }
 

@@ -99,7 +99,15 @@ void Player::StandbyUpdate()
 	{
 		ChangeState(STATE::AVOID);
 	}
+	if (ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+	{
+		ChangeState(STATE::AVOID);
+	}
 	if (ins.IsTrgDown(KEY_INPUT_SPACE))
+	{
+		ChangeState(STATE::GUARD);
+	}
+	if (ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::R_TRIGGER))
 	{
 		ChangeState(STATE::GUARD);
 	}
@@ -125,6 +133,10 @@ void Player::GuardUpdate()
 	auto& ins = InputManager::GetInstance();
 	HalfMove();
 	if (ins.IsTrgUp(KEY_INPUT_SPACE))
+	{
+		ChangeState(STATE::PARRY);
+	}
+	if (ins.IsPadBtnTrgUp(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::R_TRIGGER))
 	{
 		ChangeState(STATE::PARRY);
 	}
@@ -172,7 +184,7 @@ void Player::Draw()
 	default:
 		break;
 	}
-
+	DrawSphere3D(pos_, 60, TEN + SIX, 0x0000ff, 0x0000ff, false);
 }
 // ステイトドロー
 void Player::StandbyDraw()
@@ -187,13 +199,13 @@ void Player::AvoidDraw()
 
 void Player::GuardDraw()
 {
-	DrawSphere3D(pos_, 100.0f, 16, GetColor(0, 0, 255), GetColor(0, 0, 255), false);
+	DrawSphere3D(pos_, GUARD_RADIUS, TEN+SIX, 0x0000ff, 0x0000ff, false);
 	MV1DrawModel(model_);
 }
 
 void Player::ParryDraw()
 {
-	DrawSphere3D(pos_, 120.0f, 16, GetColor(0, 0, 255), GetColor(0, 0, 255), false);
+	DrawSphere3D(pos_, PARRY_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
 	MV1DrawModel(model_);
 }
 
@@ -247,6 +259,10 @@ void Player::Move()
 	if (ins.IsNew(KEY_INPUT_S)) { moveDir = VAdd(moveDir, AsoUtility::DIR_B); }
 	if (ins.IsNew(KEY_INPUT_A)) { moveDir = VAdd(moveDir, AsoUtility::DIR_L); }
 	if (ins.IsNew(KEY_INPUT_D)) { moveDir = VAdd(moveDir, AsoUtility::DIR_R); }
+	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLX < 0){moveDir = VAdd(moveDir, AsoUtility::DIR_L);}
+	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLX > 0){moveDir = VAdd(moveDir, AsoUtility::DIR_R);}
+	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY < 0){moveDir = VAdd(moveDir, AsoUtility::DIR_F);}
+	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY > 0){moveDir = VAdd(moveDir, AsoUtility::DIR_B);}
 
 	if (!AsoUtility::EqualsVZero(moveDir))
 	{
@@ -277,6 +293,10 @@ void Player::HalfMove()
 	if (ins.IsNew(KEY_INPUT_S)) { moveDir = VAdd(moveDir, AsoUtility::DIR_B); }
 	if (ins.IsNew(KEY_INPUT_A)) { moveDir = VAdd(moveDir, AsoUtility::DIR_L); }
 	if (ins.IsNew(KEY_INPUT_D)) { moveDir = VAdd(moveDir, AsoUtility::DIR_R); }
+	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLX < 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_L); }
+	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLX > 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_R); }
+	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY < 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_F); }
+	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY > 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_B); }
 
 	if (!AsoUtility::EqualsVZero(moveDir))
 	{
@@ -307,6 +327,10 @@ void Player::AvoidMove()
 	if (ins.IsNew(KEY_INPUT_S)) { moveDir = VAdd(moveDir, AsoUtility::DIR_B); }
 	if (ins.IsNew(KEY_INPUT_A)) { moveDir = VAdd(moveDir, AsoUtility::DIR_L); }
 	if (ins.IsNew(KEY_INPUT_D)) { moveDir = VAdd(moveDir, AsoUtility::DIR_R); }
+	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLX < 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_L); }
+	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLX > 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_R); }
+	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY < 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_F); }
+	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY > 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_B); }
 
 	if (!AsoUtility::EqualsVZero(moveDir))
 	{

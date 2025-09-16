@@ -38,7 +38,14 @@ public:
 	// 解放成功／失敗の判定
 	bool IsReleaseFail(void) const;
 
+	bool GetExit(void) const;
+
+	void SetExit(bool exit);
+
 private:
+
+
+	bool exitFlag_;
 
 	// 静的インスタンス
 	static Application* instance_;

@@ -19,7 +19,7 @@ public:
 	void Draw(void) override;
 
 private:
-
+	int count_;
 	
 
 };

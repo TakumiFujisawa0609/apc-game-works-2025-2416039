@@ -53,6 +53,17 @@ public:
 	//// カメラの取得
 	//Camera* GetCamera(void) const;
 
+
+	//文字のX 座標
+	static const int TEXT_POS_X = 400;
+	//文字のY 座標
+	static const int TEXT_POS_Y = 200;
+
+	// 文字の大きさ(大)
+	static const int TEXT_SIZE_LARGE = 100;
+	// 文字の大きさ(小)
+	static const int TEXT_SIZE_SMALL = 16;
+
 private:
 
 	int clearTime_;
@@ -95,4 +106,6 @@ private:
 	// フェード
 	void Fade(void);
 
+	bool manew_;
+	int count_;
 };

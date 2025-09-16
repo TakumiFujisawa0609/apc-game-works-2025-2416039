@@ -57,6 +57,8 @@ void Application::Init(void)
 
 	// シーン管理初期化
 	SceneManager::CreateInstance();
+
+	exitFlag_ = false;
 }
 
 void Application::Run(void)
@@ -65,7 +67,7 @@ void Application::Run(void)
 	auto& sceneManager = SceneManager::GetInstance();
 
 	// ゲームループ
-	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
+	while (ProcessMessage() == 0 && (exitFlag_ == false))
 	{
 		FpsControll_Update();
 		inputManager.Update();
@@ -110,6 +112,8 @@ bool Application::IsReleaseFail(void) const
 	return isReleaseFail_;
 }
 
+
+
 Application::Application(void)
 {
 	isInitFail_ = false;
@@ -126,4 +130,16 @@ void Application::InitEffekseer(void)
 	SetChangeScreenModeGraphicsSystemResetFlag(FALSE);
 
 	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
+}
+
+bool Application::GetExit(void) const
+{
+	return exitFlag_;
+}
+
+void Application::SetExit(bool exit)
+{
+
+	exitFlag_ = exit;
+
 }

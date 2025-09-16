@@ -21,19 +21,26 @@ void TitleScene::Init(void)
 {
 	
 	
-
+	count_ = 0;
 }
 
 void TitleScene::Update(void)
 {
-
-	
+	count_++;
 	// ƒV[ƒ“‘JˆÚ
 	InputManager& ins = InputManager::GetInstance();
-	if (ins.IsTrgDown(KEY_INPUT_SPACE))
+	if (count_ >= 3)
 	{
-		
-		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
+		if (ins.IsTrgDown(KEY_INPUT_SPACE))
+		{
+			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
+			count_ = 0;
+		}
+		if (ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+		{
+			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
+			count_ = 0;
+		}
 	}
 	
 }
