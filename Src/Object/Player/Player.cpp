@@ -19,7 +19,7 @@ void Player::Init()
 	state_ = STATE::STANDBY;
 	ChangeState(state_);
 	//ƒ‚ƒfƒ‹“Ç‚İ‚İ
-	model_ = MV1LoadModel("Data/Model/–³‘è.mv1");
+	model_ = MV1LoadModel("Data/Model/Player/–³‘è.mv1");
 	// ‰ŠúˆÊ’u
 	pos_ = { 0.0f, 50.0f, 0.0f };
 	// ‰Šú‰ñ“]
