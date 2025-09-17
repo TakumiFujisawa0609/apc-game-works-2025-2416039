@@ -40,9 +40,12 @@ void SceneManager::Init(void)
 	fader_->Init();
 
 	isSceneChanging_ = false;
+	stateFlag_ = false;
 
 	// デルタタイム
 	preTime_ = std::chrono::system_clock::now();
+
+	manewSerect_ = MANEW_SERECT::EXIT;
 
 	// 3D用の設定
 	Init3D();
@@ -88,14 +91,57 @@ void SceneManager::Update(void)
 	InputManager& ins = InputManager::GetInstance();
 	Application& app = Application::GetInstance();
 
-	if (ins.IsTrgDown(KEY_INPUT_ESCAPE))
+	if (ins.IsTrgDown(KEY_INPUT_ESCAPE)||ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
 	{
 		manew_ = true;
 
 	}
 	if (manew_ == true)
 	{
-		count_++;
+		InputManager& ins = InputManager::GetInstance();
+		// 上移動
+		isUp_ = ins.IsTrgDown(KEY_INPUT_W);
+		isUp_= (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY < 0);
+		// 下移動
+		isDown_ = ins.IsTrgDown(KEY_INPUT_S);
+		isDown_ = (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY > 0);
+		//セレクト操作
+		if (isUp_)
+		{
+			if (manewSerect_ == MANEW_SERECT::EXIT)
+			{
+				manewSerect_ = MANEW_SERECT::GAME_END;
+			}
+			else
+			{
+				manewSerect_ = static_cast<MANEW_SERECT>(static_cast<int>(manewSerect_) - 1);
+			}
+			stateFlag_ = true;
+		}
+		else if (isDown_)
+		{
+			if (manewSerect_ == MANEW_SERECT::GAME_END)
+			{
+				manewSerect_ = MANEW_SERECT::TITLE;
+			}
+			else
+			{
+				manewSerect_ = static_cast<MANEW_SERECT>(static_cast<int>(manewSerect_) + 1);
+			}
+			stateFlag_ = true;
+		}
+		if (!isUp_ && !isDown_)
+		{
+			stateFlag_ = false;
+		}
+
+
+
+
+
+
+
+		/*count_++;
 		if (ins.IsTrgDown(KEY_INPUT_RETURN))
 		{
 			app.SetExit(true);
@@ -117,7 +163,7 @@ void SceneManager::Update(void)
 				manew_ = false;
 				count_ = 0;
 			}
-		}
+		}*/
 
 	}
 
@@ -146,6 +192,15 @@ void SceneManager::Update(void)
 
 void SceneManager::Draw(void)
 {
+
+	int EXIT;
+	EXIT = strlen("戻る");
+	int TITLE;
+	TITLE = strlen("タイトルへ行く");
+	int GAME_END;
+	GAME_END = strlen("GAME_END");
+	int select;
+	select = strlen("メニュー");
 	
 	// 描画先グラフィック領域の指定
 	// (３Ｄ描画で使用するカメラの設定などがリセットされる)
@@ -171,17 +226,28 @@ void SceneManager::Draw(void)
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 / 1.1);
 		DrawBox(0, 0, Application::SCREEN_SIZE_X, Application::SCREEN_SIZE_Y, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-		if (sceneId_ != SCENE_ID::TITLE)
+		SetFontSize(96);
+		DrawString((Application::SCREEN_SIZE_X - GetDrawStringWidth("メニュー", select)) / 2, 80, "メニュー", 0xffffff);
+		if (manewSerect_ == MANEW_SERECT::EXIT)
 		{
-			SetFontSize(TEXT_SIZE_LARGE);
-			DrawFormatString(TEXT_POS_X, TEXT_POS_Y, 0xFFFFFF, "SPACEキーを押してタイトル\n\n    ENTERでゲーム終了\n\n　　　ESCで戻る");
-			SetFontSize(TEXT_SIZE_SMALL);
+			DrawString((Application::SCREEN_SIZE_X - GetDrawStringWidth("戻る", EXIT)) / 2, Application::SCREEN_SIZE_Y / 2 - 128, "戻る", 0xffffff);
+			DrawString((Application::SCREEN_SIZE_X - GetDrawStringWidth("TITLE", TITLE)) / 2, Application::SCREEN_SIZE_Y / 2 + 40, "TITLE", 0xAAAAAA);
+			DrawString((Application::SCREEN_SIZE_X - GetDrawStringWidth("GAME_END", GAME_END)) / 2, Application::SCREEN_SIZE_Y / 2 + 200, "GAME_END", 0xAAAAAA);
 		}
-		else {
-			SetFontSize(TEXT_SIZE_LARGE);
-			DrawFormatString(TEXT_POS_X, TEXT_POS_Y, 0xFFFFFF, "\n\n    ENTERでゲーム終了\n\n　　　ESCで戻る");
-			SetFontSize(TEXT_SIZE_SMALL);
+		if (manewSerect_ == MANEW_SERECT::TITLE)
+		{
+			DrawString((Application::SCREEN_SIZE_X - GetDrawStringWidth("戻る", EXIT)) / 2, Application::SCREEN_SIZE_Y / 2 - 128, "戻る", 0xAAAAAA);
+			DrawString((Application::SCREEN_SIZE_X - GetDrawStringWidth("TITLE", TITLE)) / 2, Application::SCREEN_SIZE_Y / 2 + 40, "TITLE", 0xFFFFFF);
+			DrawString((Application::SCREEN_SIZE_X - GetDrawStringWidth("GAME_END", GAME_END)) / 2, Application::SCREEN_SIZE_Y / 2 + 200, "GAME_END", 0xAAAAAA);
 		}
+		if (manewSerect_ == MANEW_SERECT::GAME_END)
+		{
+			DrawString((Application::SCREEN_SIZE_X - GetDrawStringWidth("戻る", EXIT)) / 2, Application::SCREEN_SIZE_Y / 2 - 128, "戻る", 0xAAAAAA);
+			DrawString((Application::SCREEN_SIZE_X - GetDrawStringWidth("TITLE", TITLE)) / 2, Application::SCREEN_SIZE_Y / 2 + 40, "TITLE", 0xAAAAAA);
+			DrawString((Application::SCREEN_SIZE_X - GetDrawStringWidth("GAME_END", GAME_END)) / 2, Application::SCREEN_SIZE_Y / 2 + 200, "GAME_END", 0xFFFFFF);
+		}
+		SetFontSize(16);
+		
 	}
 
 }
@@ -214,6 +280,29 @@ float SceneManager::GetDeltaTime(void) const
 {
 	//return 1.0f / 60.0f;
 	return deltaTime_;
+}
+
+void SceneManager::State(void)
+{
+	InputManager& ins = InputManager::GetInstance();
+	if (!stateFlag_ && ins.IsTrgDown(KEY_INPUT_SPACE)|| !stateFlag_&& ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+	{
+
+		if (manewSerect_ == MANEW_SERECT::GAME_END)
+		{
+			Application& app = Application::GetInstance();
+			app.SetExit(true);
+		}
+		if (manewSerect_ == MANEW_SERECT::TITLE)
+		{
+			
+			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
+		}
+		if (manewSerect_ == MANEW_SERECT::EXIT)
+		{
+			manew_ = false;
+		}
+	}
 }
 
 

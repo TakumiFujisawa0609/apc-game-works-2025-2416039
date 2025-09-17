@@ -23,6 +23,13 @@ public:
 		GAME,
 		
 	};
+
+	enum class MANEW_SERECT
+	{
+		GAME_END,
+		TITLE,
+		EXIT,
+	};
 	
 	// インスタンスの生成
 	static void CreateInstance(void);
@@ -53,6 +60,7 @@ public:
 	//// カメラの取得
 	//Camera* GetCamera(void) const;
 
+	void State(void);
 
 	//文字のX 座標
 	static const int TEXT_POS_X = 400;
@@ -80,10 +88,14 @@ private:
 	// 各種シーン
 	std::unique_ptr<Fader> fader_;
 
-
+	MANEW_SERECT manewSerect_;
 
 	// シーン遷移中判定
 	bool isSceneChanging_;
+
+	bool stateFlag_;
+	bool isUp_;
+	bool isDown_;
 
 	// デルタタイム
 	std::chrono::system_clock::time_point preTime_;

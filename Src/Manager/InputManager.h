@@ -42,6 +42,10 @@ public:
 		RIGHT,
 		TOP,
 		DOWN,
+		LB,
+		RB,
+		BACK,
+		START,
 		R_TRIGGER,
 		L_TRIGGER,
 		MAX
