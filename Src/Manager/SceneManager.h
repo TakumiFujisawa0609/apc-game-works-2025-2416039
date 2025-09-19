@@ -96,7 +96,8 @@ private:
 	bool stateFlag_;
 	bool isUp_;
 	bool isDown_;
-
+	bool isUpStick_;
+	bool isDownStick_;
 	// デルタタイム
 	std::chrono::system_clock::time_point preTime_;
 	float deltaTime_;
