@@ -1,0 +1,60 @@
+#pragma once
+#include <vector>
+
+class EnemyBase;
+class Player;
+class GameScene;
+
+class EnemyManager
+{
+public:
+
+	static constexpr int MAX_W = 1;
+
+
+	// 敵の生成ウェーブ
+	enum class WAVE
+	{
+		WAVE01,
+		WAVE02,
+		WAVE03,
+		END
+	};
+
+	// コンストラクタ
+	EnemyManager(Player* player, GameScene* gameScene);
+	// デストラクタ
+	~EnemyManager(void);
+	void Init(void);
+	void Update(void);
+	void Draw(void);
+	void Release(void);
+
+	void WAVE01();
+	void WAVE02();
+	void WAVE03();
+	void END();
+
+	void ChangeWave(WAVE wave);
+
+	std::vector<EnemyBase*> GetEnemys();
+
+private:
+
+	int sponCuntW_;
+
+	// エネミー用のモデルハンドルID
+	std::vector<int> enemyModelIds_;
+
+	// 攻撃エフェクト用のモデルハンドルID
+	std::vector<int> attackEffectModelIds_;
+
+	// エネミー
+	std::vector<EnemyBase*> enemys_;
+	// プレイヤーのポインタ
+	Player* player_;
+	//ゲームシーンのポインタ
+	GameScene* gameScene_;
+
+
+};

@@ -141,6 +141,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Collision\Collision.h" />
+    <ClInclude Include="Src\Manager\EnemyManager.h" />
+    <ClInclude Include="Src\Object\Enemy\EnemyBase.h" />
+    <ClInclude Include="Src\Object\Enemy\EnemyWizard.h" />
     <ClInclude Include="Src\Object\Player\Player.h" />
     <ClInclude Include="Src\Application.h" />
     <ClInclude Include="Src\Common\Fader.h" />
@@ -154,6 +158,8 @@
     <ClInclude Include="Src\Manager\SceneManager.h" />
     <ClInclude Include="Src\Object\Camera\Camera.h" />
     <ClInclude Include="Src\Object\Grid\Grid.h" />
+    <ClInclude Include="Src\Object\Shot\ShotBase.h" />
+    <ClInclude Include="Src\Object\Shot\ShotStraight.h" />
     <ClInclude Include="Src\Scene\GameScene.h" />
     <ClInclude Include="Src\Scene\SceneBase.h" />
     <ClInclude Include="Src\Scene\TitleScene.h" />
@@ -161,6 +167,10 @@
     <ClInclude Include="Src\Common\Vector2F.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Collision\Collision.cpp" />
+    <ClCompile Include="Src\Manager\EnemyManager.cpp" />
+    <ClCompile Include="Src\Object\Enemy\EnemyBase.cpp" />
+    <ClCompile Include="Src\Object\Enemy\EnemyWizard.cpp" />
     <ClCompile Include="Src\Object\Player\Player.cpp" />
     <ClCompile Include="Src\Application.cpp" />
     <ClCompile Include="Src\Common\Fader.cpp" />
@@ -174,6 +184,8 @@
     <ClCompile Include="Src\Manager\SceneManager.cpp" />
     <ClCompile Include="Src\Object\Camera\Camera.cpp" />
     <ClCompile Include="Src\Object\Grid\Grid.cpp" />
+    <ClCompile Include="Src\Object\Shot\ShotBase.cpp" />
+    <ClCompile Include="Src\Object\Shot\ShotStraight.cpp" />
     <ClCompile Include="Src\Scene\GameScene.cpp" />
     <ClCompile Include="Src\Scene\SceneBase.cpp" />
     <ClCompile Include="Src\Scene\TitleScene.cpp" />

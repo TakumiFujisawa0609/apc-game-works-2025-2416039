@@ -3,6 +3,7 @@
 #include "../Common/Vector2.h"
 #include <vector>
 
+class EnemyManager;
 class Player;
 class Camera;
 class Grid;
@@ -33,5 +34,8 @@ private:
 
 	//プレイヤー
 	Player* player_;
+
+	//敵マネージャー
+	EnemyManager* enemyManager_;
 	
 };

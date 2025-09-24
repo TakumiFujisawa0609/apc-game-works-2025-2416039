@@ -19,7 +19,10 @@ void Player::Init()
 	state_ = STATE::STANDBY;
 	ChangeState(state_);
 	//モデル読み込み
-	model_ = MV1LoadModel("Data/Model/Player/無題.mv1");
+	// 画像の読み込み
+	ResourceManager& res = ResourceManager::GetInstance(); // リソースマネージャのインスタンス取得
+
+	model_ = res.Load(ResourceManager::SRC::PlayerModel).handleId_;
 	// 初期位置
 	pos_ = { 0.0f, 50.0f, 0.0f };
 	// 初期回転

@@ -12,7 +12,9 @@ public:
 	// リソース名
 	enum class SRC
 	{
-		
+		PlayerModel,
+		EnemyW,
+		EFFCT1,
 	};
 
 	// 明示的にインステンスを生成する

@@ -72,6 +72,9 @@ public:
 	// 文字の大きさ(小)
 	static const int TEXT_SIZE_SMALL = 16;
 
+	//ディレイマックス
+	static const int DELAY_MAX = 10;
+
 private:
 
 	int clearTime_;
@@ -93,6 +96,9 @@ private:
 	// シーン遷移中判定
 	bool isSceneChanging_;
 
+
+	//メニュー関連
+	int delayCount_;
 	bool stateFlag_;
 	bool isUp_;
 	bool isDown_;

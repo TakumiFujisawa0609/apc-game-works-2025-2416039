@@ -4,6 +4,7 @@
 #include "../Manager/SceneManager.h"
 #include "../Manager/ResourceManager.h"
 #include "../Manager/InputManager.h"
+#include "../Manager/EnemyManager.h"
 #include "../Object/Camera/Camera.h"
 #include "../Object/Grid/Grid.h"
 #include "../Object/Player/Player.h"
@@ -31,18 +32,21 @@ void GameScene::Init(void)
 	//プレイヤー機能の初期化
 	player_ = new Player();
 
+	//エネミー管理機能の初期化
+	enemyManager_ = new EnemyManager(player_,this);
 
 	//Init
 	camera_->Init(player_);
 	grid_->Init();
 	player_->Init();
+	enemyManager_->Init();
 }
 
 void GameScene::Update(void)
 {
 	InputManager& ins = InputManager::GetInstance();
 	player_->Update();
-	
+	enemyManager_->Update();
 	// シーン遷移
 	if (ins.IsTrgDown(KEY_INPUT_R)||ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::BACK))
 	{
@@ -59,6 +63,10 @@ void GameScene::Draw(void)
 	grid_->Draw();
 	//プレイヤー
 	player_->Draw();
+
+	//エネミー
+	enemyManager_->Draw();
+
 	DrawString(0, 100, "Game Scene", 0x000000);
 }
 

@@ -39,6 +39,7 @@ void SceneManager::Init(void)
 	
 	fader_->Init();
 
+	delayCount_ = DELAY_MAX;
 	isSceneChanging_ = false;
 	stateFlag_ = false;
 
@@ -91,51 +92,63 @@ void SceneManager::Update(void)
 	InputManager& ins = InputManager::GetInstance();
 	Application& app = Application::GetInstance();
 
-	if (ins.IsTrgDown(KEY_INPUT_ESCAPE)||ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
+	if (ins.IsTrgDown(KEY_INPUT_ESCAPE) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
 	{
 		manew_ = true;
 
 	}
 	if (manew_ == true)
 	{
+		delayCount_++;
+
+		if(delayCount_ >= DELAY_MAX)
+		{
+			delayCount_ = DELAY_MAX;
+		}
 		InputManager& ins = InputManager::GetInstance();
 		// è„à⁄ìÆ
-		isUp_ = (ins.IsTrgDown(KEY_INPUT_W));
+		isUp_ = (ins.IsNew(KEY_INPUT_W));
 		isUpStick_ = (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY < 0);
 		// â∫à⁄ìÆ
-		isDown_ = (ins.IsTrgDown(KEY_INPUT_S));
+		isDown_ = (ins.IsNew(KEY_INPUT_S));
 		isDownStick_ = (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY > 0);
 		//ÉZÉåÉNÉgëÄçÏ
-		if (isUp_|| isUpStick_)
+		if (delayCount_ >= DELAY_MAX)
 		{
-			if (manewSerect_ == MANEW_SERECT::GAME_END)
-			{
-				manewSerect_ = MANEW_SERECT::EXIT;
-			}
-			else
-			{
-				manewSerect_ = static_cast<MANEW_SERECT>(static_cast<int>(manewSerect_) - 1);
-			}
-			stateFlag_ = true;
-		}
-		else if (isDown_|| isDownStick_)
-		{
-			if (manewSerect_ == MANEW_SERECT::EXIT)
-			{
-				manewSerect_ = MANEW_SERECT::GAME_END;
-			}
-			else
-			{
-				manewSerect_ = static_cast<MANEW_SERECT>(static_cast<int>(manewSerect_) + 1);
-			}
-			stateFlag_ = true;
-		}
-		if (!isUp_ && !isDown_)
-		{
-			stateFlag_ = false;
-		}
 
+			if (isUp_ || isUpStick_)
+			{
+				if (manewSerect_ == MANEW_SERECT::GAME_END)
+				{
+					manewSerect_ = MANEW_SERECT::EXIT;
+				}
+				else
+				{
+					manewSerect_ = static_cast<MANEW_SERECT>(static_cast<int>(manewSerect_) - 1);
+				}
+				stateFlag_ = true;
+				delayCount_ = 0;
+			}
+			else if (isDown_ || isDownStick_)
+			{
+				if (manewSerect_ == MANEW_SERECT::EXIT)
+				{
+					manewSerect_ = MANEW_SERECT::GAME_END;
+				}
+				else
+				{
+					manewSerect_ = static_cast<MANEW_SERECT>(static_cast<int>(manewSerect_) + 1);
+				}
+				stateFlag_ = true;
+				delayCount_ = 0;
+			}
+			if (!isUp_ && !isDown_)
+			{
+				stateFlag_ = false;
+				delayCount_ = 0;
+			}
 
+		}
 
 
 
@@ -167,7 +180,7 @@ void SceneManager::Update(void)
 		State();
 
 	}
-	
+
 	if (scene_ == nullptr)
 	{
 		return;
@@ -186,9 +199,9 @@ void SceneManager::Update(void)
 	}
 	else
 	{
-		if (!manew_) 
+		if (!manew_)
 		{
-			scene_->Update(); 
+			scene_->Update();
 		}
 	}
 
