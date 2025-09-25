@@ -187,7 +187,9 @@ void Player::Draw()
 	default:
 		break;
 	}
-	DrawSphere3D(pos_, 60, TEN + SIX, 0x0000ff, 0x0000ff, false);
+	DrawSphere3D(pos_, DAMAGE_RADIUS,TEN + SIX, 0x0000ff, 0x0000ff, false);
+
+	collisionRadius_= DAMAGE_RADIUS;
 }
 // ステイトドロー
 void Player::StandbyDraw()
@@ -203,12 +205,14 @@ void Player::AvoidDraw()
 void Player::GuardDraw()
 {
 	DrawSphere3D(pos_, GUARD_RADIUS, TEN+SIX, 0x0000ff, 0x0000ff, false);
+	collisionRadius_ = GUARD_RADIUS;
 	MV1DrawModel(model_);
 }
 
 void Player::ParryDraw()
 {
 	DrawSphere3D(pos_, PARRY_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
+	collisionRadius_ = PARRY_RADIUS;
 	MV1DrawModel(model_);
 }
 
@@ -355,6 +359,15 @@ void Player::AvoidMove()
 	}
 
 }
+bool Player::IsCollisionState(void)
+{
+	// プレイヤーの状態が衝突判定を行う状態かどうか
+	if (state_ == STATE::STANDBY || state_ == STATE::AVOID||state_==STATE::GUARD||state_==STATE::PARRY)
+	{
+		return true;
+	}
+	return false;
+}
 // ゲッターセッター＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 VECTOR Player::GetPos()
 {
@@ -394,5 +407,10 @@ int Player::GetGp()
 void Player::SetGp(int gp)
 {
 	gp_ = gp;
+}
+
+float Player::GetCollisionRadius()
+{
+	return collisionRadius_;
 }
 

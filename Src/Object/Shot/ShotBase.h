@@ -31,6 +31,8 @@ public:
 	// ’e‚ÌŽí•Ê
 	TYPE GetType(void);
 
+	bool IsCollisionState(void);
+
 	float GetRadius(void);
 protected:
 	// ’e‚ÌŽí•Ê

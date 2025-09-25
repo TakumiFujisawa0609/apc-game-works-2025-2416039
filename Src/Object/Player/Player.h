@@ -40,6 +40,7 @@ public:
 
 	static constexpr float MAX_COUNT = 5.0f; //カウントの最大値
 	
+	static constexpr float DAMAGE_RADIUS = 60.0f;//ダメージ時の半径
 	static constexpr float GUARD_RADIUS = 100.0f;//ガード時の半径
 	static constexpr float PARRY_RADIUS = 120.0f;//パリィ時の半径
 
@@ -58,6 +59,7 @@ private:
 
 	float count_;
 
+	float collisionRadius_;//当たり判定用半径
 
 
 public:
@@ -100,7 +102,7 @@ public:
 	void Move();
 	void HalfMove();
 	void AvoidMove();
-
+	bool IsCollisionState(void);
 
 	//ゲッターセッター
 	VECTOR GetPos();
@@ -112,6 +114,6 @@ public:
 	int GetGp();
 	void SetGp(int gp);
 
-
+	float GetCollisionRadius();
 };
 
