@@ -4,6 +4,7 @@
 #include <vector>
 
 class EnemyManager;
+class Collision;
 class Player;
 class Camera;
 class Grid;
@@ -37,5 +38,9 @@ private:
 
 	//敵マネージャー
 	EnemyManager* enemyManager_;
+
+	//当たり判定
+	Collision* collision_;
+
 	
 };

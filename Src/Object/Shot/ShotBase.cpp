@@ -69,6 +69,10 @@ bool ShotBase::IsAlive(void)
 {
     return isAlive_;
 }
+void ShotBase::SetIsAlive(bool is)
+{
+    	isAlive_ = is;
+}
 VECTOR ShotBase::GetPos(void)
 {
     return pos_;

@@ -5,6 +5,7 @@
 #include "../Manager/ResourceManager.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/EnemyManager.h"
+#include "../Object/Collision/Collision.h"
 #include "../Object/Camera/Camera.h"
 #include "../Object/Grid/Grid.h"
 #include "../Object/Player/Player.h"
@@ -35,11 +36,15 @@ void GameScene::Init(void)
 	//エネミー管理機能の初期化
 	enemyManager_ = new EnemyManager(player_,this);
 
+	//当たり判定機能の初期化
+	collision_ = new Collision();
+
 	//Init
 	camera_->Init(player_);
 	grid_->Init();
 	player_->Init(camera_);
 	enemyManager_->Init();
+	collision_->Init(player_,enemyManager_);
 
 	camera_->ChangeMode(Camera::MODE::FOLLOW);
 }
@@ -49,6 +54,7 @@ void GameScene::Update(void)
 	InputManager& ins = InputManager::GetInstance();
 	player_->Update();
 	enemyManager_->Update();
+	collision_->Update();
 	// シーン遷移
 	if (ins.IsTrgDown(KEY_INPUT_R)||ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::BACK))
 	{

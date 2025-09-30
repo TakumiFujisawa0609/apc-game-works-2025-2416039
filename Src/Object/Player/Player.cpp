@@ -27,6 +27,7 @@ void Player::Init(Camera* camera)
 	// 画像の読み込み
 	ResourceManager& res = ResourceManager::GetInstance(); // リソースマネージャのインスタンス取得
 
+	
 	model_ = res.Load(ResourceManager::SRC::PlayerModel).handleId_;
 	// 初期位置
 	pos_ = { 0.0f, 50.0f, 0.0f };
@@ -43,6 +44,15 @@ void Player::Init(Camera* camera)
 	sp_ = MAX_SP;
 	// 初期ガード
 	gp_ = MAX_GP;
+
+
+	// 生存フラグ
+	isAlive_ = true;
+	// 無敵カウント
+	invCnt_ = 0;
+
+	// モデルの自己発光色設定
+	MV1SetMaterialEmiColor(model_, 0, COLOR_EMI_DEFAULT);
 
 	MV1SetPosition(model_, pos_);
 	MV1SetRotationMatrix(model_, MatrixUtility::Multiplication(localrot_, rot_));
@@ -66,6 +76,7 @@ void Player::ChangeParry()
 }
 void Player::ChangeDamage()
 {
+	
 }
 void Player::ChangeDead()
 {
@@ -109,24 +120,39 @@ void Player::StandbyUpdate()
 	auto& ins = InputManager::GetInstance();
 	Move();
 	DelayRotate();
-	if (ins.IsTrgDown(KEY_INPUT_LSHIFT))
+	if (sp_ > 25.0f)
 	{
-		ChangeState(STATE::AVOID);
+		if (ins.IsTrgDown(KEY_INPUT_LSHIFT))
+		{
+			ChangeState(STATE::AVOID);
+		}
+		if (ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+		{
+			ChangeState(STATE::AVOID);
+		}
 	}
-	if (ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+	// ガード
+	if (gp_ > 10.0f)
 	{
-		ChangeState(STATE::AVOID);
+		if (ins.IsTrgDown(KEY_INPUT_SPACE))
+		{
+			ChangeState(STATE::GUARD);
+		}
+		if (ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::R_TRIGGER))
+		{
+			ChangeState(STATE::GUARD);
+		}
 	}
-	if (ins.IsTrgDown(KEY_INPUT_SPACE))
+	if (sp_ < MAX_SP)
 	{
-		ChangeState(STATE::GUARD);
+		sp_ += 1.0f;
 	}
-	if (ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::R_TRIGGER))
+	if (gp_ < MAX_GP)
 	{
-		ChangeState(STATE::GUARD);
+		gp_ += 1.0f;
 	}
 
-	
+
 }
 
 void Player::AvoidUpdate()
@@ -169,6 +195,20 @@ void Player::ParryUpdate()
 }
 void Player::DamageUpdate()
 {
+	Move();
+	DelayRotate();
+	if (isAlive_ == false)
+	{
+		isAlive_ = true;
+		// 無敵時間
+		invCnt_ = 120;
+	}
+	invCnt_--;	
+	if (invCnt_ < 0)
+	{
+		ChangeState(STATE::STANDBY);
+	}
+	
 }
 void Player::DeadUpdate()
 {
@@ -176,6 +216,27 @@ void Player::DeadUpdate()
 // ドロー
 void Player::Draw()
 {
+	if (isAlive_)
+	{
+
+		bool isTrans = false;
+		if (invCnt_ > 0)
+		{
+			if (invCnt_ / 5 % 2 == 0)
+			{
+				isTrans = true;
+			}
+		}
+		if (isTrans)
+		{
+			MV1SetMaterialEmiColor(model_, 0, { 0.0f,0.0f,0.0f });
+		}
+		else
+		{
+
+			MV1SetMaterialEmiColor(model_, 0, COLOR_EMI_DEFAULT);
+		}
+	}
 	switch (state_)
 	{
 	case Player::STATE::STANDBY:
@@ -199,19 +260,32 @@ void Player::Draw()
 	default:
 		break;
 	}
-	DrawSphere3D(pos_, DAMAGE_RADIUS,TEN + SIX, 0x0000ff, 0x0000ff, false);
+	float hpS = hp_ / MAX_HP;
+	float hpDrawS = hpS * 200.0f;
+	DrawBox(50, 50, 50 + hpDrawS, 80, 0xff0000, true);
+	float spS = sp_ / MAX_SP;
+	float spDrawS = spS * 200.0f;
+	DrawBox(50, 90, 50 + spDrawS, 120, 0x00FF00, true);
+	float gpS = gp_ / MAX_GP;
+	float gpDrawS = gpS * 200.0f;
+	DrawBox(50, 130, 50 + gpDrawS, 160, 0x0000FF, true);
 
-	collisionRadius_= DAMAGE_RADIUS;
 }
 // ステイトドロー
 void Player::StandbyDraw()
 {
 	MV1DrawModel(model_);
+	DrawSphere3D(pos_, DAMAGE_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
+
+	collisionRadius_ = DAMAGE_RADIUS;
 }
 
 void Player::AvoidDraw()
 {
 	MV1DrawModel(model_);
+	DrawSphere3D(pos_, AVOID_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
+
+	collisionRadius_ = AVOID_RADIUS;
 }
 
 void Player::GuardDraw()
@@ -230,6 +304,7 @@ void Player::ParryDraw()
 
 void Player::DamageDraw()
 {
+	
 	MV1DrawModel(model_);
 }
 
@@ -264,6 +339,10 @@ void Player::ChangeState(STATE state)
 	default:
 		break;
 	}
+
+	
+
+
 }
 
 
@@ -444,6 +523,38 @@ bool Player::IsCollisionState(void)
 		return true;
 	}
 	return false;
+}
+
+void Player::Hit(bool is)
+{
+	bool isHit = false;
+	isHit = is;
+
+	if (isHit)
+	{
+		if(state_==STATE::STANDBY)
+		{
+
+			ChangeState(STATE::DAMAGE);
+			isAlive_ = false;
+			isHit = false;
+		}
+
+		if (state_ == STATE::GUARD)
+		{
+			gp_-=10.0f;
+			
+		}
+		if (state_ == STATE::PARRY)
+		{
+			gp_ += 10.0f;
+		}
+		if (state_ == STATE::AVOID)
+		{
+			sp_ -= 25.0f;
+		}
+	}
+
 }
 
 

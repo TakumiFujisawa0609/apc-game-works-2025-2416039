@@ -217,7 +217,7 @@ void Camera::MoveXYZDirectionPad(void)
 {
 	auto& ins = InputManager::GetInstance();
 	// 矢印キーでカメラの角度を変える
-	float rotPow = 1.0f * DX_PI_F / 180.0f;
+	float rotPow = 3.0f * DX_PI_F / 180.0f;
 
 	// 接続されているゲームパッド１の情報を取得
 	InputManager::JOYPAD_IN_STATE padState =

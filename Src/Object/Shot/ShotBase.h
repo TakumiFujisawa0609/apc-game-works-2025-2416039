@@ -24,6 +24,8 @@ public:
 	void Release(void);
 	// ¶‘¶”»’è
 	bool IsAlive(void);
+	void SetIsAlive(bool is);
+
 	// ’e‚ÌÀ•W
 	VECTOR GetPos(void);
 	// ’e‚ÌÕ“Ë”»’è—p”¼Œa

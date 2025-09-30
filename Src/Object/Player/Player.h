@@ -37,17 +37,19 @@ public:
 	static constexpr float MOVE_SPEED_HALF = 5.0f; //移動速度半分
 	static constexpr float AVOID_SPEED = 30.0f; //回避速度
 
-	static constexpr int MAX_HP = 100; //最大体力
-	static constexpr int MAX_SP = 100; //最大スタミナ
-	static constexpr int MAX_GP = 100; //最大ガード
+	static constexpr float MAX_HP = 100; //最大体力
+	static constexpr float MAX_SP = 100; //最大スタミナ
+	static constexpr float MAX_GP = 100; //最大ガード
 
 	static constexpr float MAX_COUNT = 5.0f; //カウントの最大値
 	
 	static constexpr float DAMAGE_RADIUS = 60.0f;//ダメージ時の半径
+	static constexpr float AVOID_RADIUS = 80.0f;//回避時の半径
 	static constexpr float GUARD_RADIUS = 100.0f;//ガード時の半径
 	static constexpr float PARRY_RADIUS = 120.0f;//パリィ時の半径
 
-
+	// 標準の自己発光色
+	static constexpr COLOR_F COLOR_EMI_DEFAULT = { 0.5f, 0.5f, 0.5f, 0.5f };
 private:
 
 	int model_;//モデル
@@ -56,11 +58,12 @@ private:
 	VECTOR localrot_;//ローカル回転
 	VECTOR scale_;//大きさ
 	STATE state_;//状態
-	int hp_;//体力
-	int sp_;//スタミナ
-	int gp_;//ガード
+	float hp_;//体力
+	float sp_;//スタミナ
+	float gp_;//ガード
 	VECTOR moveDir_;//移動方向
-
+	bool isAlive_;//生存フラグ
+	int invCnt_;//無敵カウント
 	float count_;
 
 	float collisionRadius_;//当たり判定用半径
@@ -110,7 +113,7 @@ public:
 	void HalfMove();
 	void AvoidMove();
 	bool IsCollisionState(void);
-
+	void Hit(bool is);
 	//ゲッターセッター
 	VECTOR GetPos();
 	void SetPos(VECTOR pos);
