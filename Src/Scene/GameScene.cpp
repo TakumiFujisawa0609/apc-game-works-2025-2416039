@@ -38,8 +38,10 @@ void GameScene::Init(void)
 	//Init
 	camera_->Init(player_);
 	grid_->Init();
-	player_->Init();
+	player_->Init(camera_);
 	enemyManager_->Init();
+
+	camera_->ChangeMode(Camera::MODE::FOLLOW);
 }
 
 void GameScene::Update(void)

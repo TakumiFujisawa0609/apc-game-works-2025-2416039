@@ -1,7 +1,9 @@
 #include <DxLib.h>
 #include "../../Utility/AsoUtility.h"
+#include "../../Utility/MatrixUtility.h"
 #include "../../Manager/InputManager.h"
 #include "../../Manager/ResourceManager.h"
+#include "../Camera/Camera.h"
 #include "Player.h"
 
 Player::Player()
@@ -13,8 +15,11 @@ Player::~Player()
 
 }
 // 初期化
-void Player::Init()
+void Player::Init(Camera* camera)
 {
+
+	camera_ = camera;
+
 	// 初期ステイト
 	state_ = STATE::STANDBY;
 	ChangeState(state_);
@@ -27,18 +32,20 @@ void Player::Init()
 	pos_ = { 0.0f, 50.0f, 0.0f };
 	// 初期回転
 	rot_ = { 0.0f, 0.0f, 0.0f };
+
+	localrot_ = { 0.0f, AsoUtility::Deg2RadF(180.0f), 0.0f};
 	// 初期大きさ
 	scale_ = { 0.5f, 0.5f, 0.5f };
-	
+
 	// 初期体力
 	hp_ = MAX_HP;
 	// 初期スタミナ
 	sp_ = MAX_SP;
 	// 初期ガード
 	gp_ = MAX_GP;
-	
+
 	MV1SetPosition(model_, pos_);
-	MV1SetRotationXYZ(model_, rot_);
+	MV1SetRotationMatrix(model_, MatrixUtility::Multiplication(localrot_, rot_));
 	MV1SetScale(model_, scale_);
 
 }
@@ -90,7 +97,10 @@ void Player::Update()
 		break;
 	}
 	MV1SetPosition(model_, pos_);
-	MV1SetRotationXYZ(model_, rot_);
+	// 行列の合成(子, 親と指定すると親⇒子の順に適用される)
+	MATRIX mat = MatrixUtility::Multiplication(localrot_, rot_);
+	// 回転行列をモデルに反映
+	MV1SetRotationMatrix(model_, mat);
 
 }
 // ステイトアプデ
@@ -98,6 +108,7 @@ void Player::StandbyUpdate()
 {
 	auto& ins = InputManager::GetInstance();
 	Move();
+	DelayRotate();
 	if (ins.IsTrgDown(KEY_INPUT_LSHIFT))
 	{
 		ChangeState(STATE::AVOID);
@@ -120,10 +131,10 @@ void Player::StandbyUpdate()
 
 void Player::AvoidUpdate()
 {
-	rot_.x += AsoUtility::Deg2RadF(-20.0f);
+	rot_.x += AsoUtility::Deg2RadF(20.0f);
 	AvoidMove();
-	
-	if (rot_.x <= AsoUtility::Deg2RadF(-360.0f))
+	DelayRotate();
+	if (rot_.x >= AsoUtility::Deg2RadF(360.0f))
 	{
 		rot_.x = 0.0f;
 		ChangeState(STATE::STANDBY);
@@ -135,6 +146,7 @@ void Player::GuardUpdate()
 {
 	auto& ins = InputManager::GetInstance();
 	HalfMove();
+	DelayRotate();
 	if (ins.IsTrgUp(KEY_INPUT_SPACE))
 	{
 		ChangeState(STATE::PARRY);
@@ -148,7 +160,7 @@ void Player::ParryUpdate()
 {
 	count_ += 0.5f;
 	HalfMove();
-
+	DelayRotate();
 	if (count_ >= MAX_COUNT)
 	{
 		ChangeState(STATE::STANDBY);
@@ -259,103 +271,168 @@ void Player::ChangeState(STATE state)
 //機能＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 void Player::Move()
 {
-	InputManager& ins = InputManager::GetInstance();
-	//
-	VECTOR moveDir = AsoUtility::VECTOR_ZERO;
-	if (ins.IsNew(KEY_INPUT_W)) { moveDir = VAdd(moveDir, AsoUtility::DIR_F); }
-	if (ins.IsNew(KEY_INPUT_S)) { moveDir = VAdd(moveDir, AsoUtility::DIR_B); }
-	if (ins.IsNew(KEY_INPUT_A)) { moveDir = VAdd(moveDir, AsoUtility::DIR_L); }
-	if (ins.IsNew(KEY_INPUT_D)) { moveDir = VAdd(moveDir, AsoUtility::DIR_R); }
-	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLX < 0){moveDir = VAdd(moveDir, AsoUtility::DIR_L);}
-	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLX > 0){moveDir = VAdd(moveDir, AsoUtility::DIR_R);}
-	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY < 0){moveDir = VAdd(moveDir, AsoUtility::DIR_F);}
-	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY > 0){moveDir = VAdd(moveDir, AsoUtility::DIR_B);}
+	VECTOR camPos = camera_->GetPos();
+	VECTOR camAngles = camera_->GetAngles();
 
-	if (!AsoUtility::EqualsVZero(moveDir))
+
+	auto& ins = InputManager::GetInstance();
+	VECTOR dir = AsoUtility::VECTOR_ZERO;
+
+	// ゲームパッドが接続数で処理を分ける
+	if (GetJoypadNum() == 0)
 	{
-		
-		moveDir = VNorm(moveDir);
+		// WASDで移動する
+		if (ins.IsNew(KEY_INPUT_W)) { dir = { 0.0f, 0.0f, 1.0f }; }
+		if (ins.IsNew(KEY_INPUT_A)) { dir = { -1.0f, 0.0f, 0.0f }; }
+		if (ins.IsNew(KEY_INPUT_S)) { dir = { 0.0f, 0.0f, -1.0f }; }
+		if (ins.IsNew(KEY_INPUT_D)) { dir = { 1.0f, 0.0f, 0.0f }; }
+	}
+	else
+	{
+		// 接続されているゲームパッド１の情報を取得
+		InputManager::JOYPAD_IN_STATE padState =
+			ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+		// アナログキーの入力値から方向を取得
+		dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
+	}
 
-		moveDir_ = moveDir;
-		rot_.y = atan2(moveDir_.x, moveDir_.z) + DX_PI_F;
 
-		//
-		VECTOR movePos = VScale(moveDir_, MOVE_SPEED);
-		//
-		pos_ = VAdd(pos_, movePos);
+	if (!AsoUtility::EqualsVZero(dir))
+	{
+		// XYZの回転行列
+	   // XZ平面移動にする場合は、XZの回転を考慮しないようにする
+		MATRIX mat = MGetIdent();
+		//mat = MMult(mat, MGetRotX(angles_.x));
+		mat = MMult(mat, MGetRotY(camAngles.y));
+		//mat = MMult(mat, MGetRotZ(angles_.z));
+		// 回転行列を使用して、ベクトルを回転させる
+		VECTOR moveDir = VTransform(dir, mat);
 
-		//angles_.y = AsoUtility::Deg2RadF(180.0f);
-		MV1SetPosition(model_, pos_);
+		// 回転行列を使用して、ベクトルを回転させる
+		moveDir_ = VTransform(dir, mat);
+		// 移動方向から角度に変換する
+		//angles_.y = atan2f(moveDir_.x, moveDir_.z);
+		// 方向×スピードで移動量を作って、座標に足して移動
+		pos_ = VAdd(pos_, VScale(moveDir_, MOVE_SPEED));
 
-		MV1SetRotationXYZ(model_, rot_);
+		//animationController_->Play(static_cast<int>(ANIM_TYPE::WALK));
+
+
+	}
+	else
+	{
+		//animationController_->Play(static_cast<int>(ANIM_TYPE::IDLE));
 	}
 
 }
 void Player::HalfMove()
 {
-	InputManager& ins = InputManager::GetInstance();
-	//
-	VECTOR moveDir = AsoUtility::VECTOR_ZERO;
-	if (ins.IsNew(KEY_INPUT_W)) { moveDir = VAdd(moveDir, AsoUtility::DIR_F); }
-	if (ins.IsNew(KEY_INPUT_S)) { moveDir = VAdd(moveDir, AsoUtility::DIR_B); }
-	if (ins.IsNew(KEY_INPUT_A)) { moveDir = VAdd(moveDir, AsoUtility::DIR_L); }
-	if (ins.IsNew(KEY_INPUT_D)) { moveDir = VAdd(moveDir, AsoUtility::DIR_R); }
-	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLX < 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_L); }
-	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLX > 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_R); }
-	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY < 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_F); }
-	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY > 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_B); }
+	VECTOR camPos = camera_->GetPos();
+	VECTOR camAngles = camera_->GetAngles();
 
-	if (!AsoUtility::EqualsVZero(moveDir))
+
+	auto& ins = InputManager::GetInstance();
+	VECTOR dir = AsoUtility::VECTOR_ZERO;
+
+	// ゲームパッドが接続数で処理を分ける
+	if (GetJoypadNum() == 0)
 	{
-
-		moveDir = VNorm(moveDir);
-
-		moveDir_ = moveDir;
-		rot_.y = atan2(moveDir_.x, moveDir_.z) + DX_PI_F;
-
-		//
-		VECTOR movePos = VScale(moveDir_, MOVE_SPEED_HALF);
-		//
-		pos_ = VAdd(pos_, movePos);
-
-		//angles_.y = AsoUtility::Deg2RadF(180.0f);
-		MV1SetPosition(model_, pos_);
-
-		MV1SetRotationXYZ(model_, rot_);
+		// WASDで移動する
+		if (ins.IsNew(KEY_INPUT_W)) { dir = { 0.0f, 0.0f, 1.0f }; }
+		if (ins.IsNew(KEY_INPUT_A)) { dir = { -1.0f, 0.0f, 0.0f }; }
+		if (ins.IsNew(KEY_INPUT_S)) { dir = { 0.0f, 0.0f, -1.0f }; }
+		if (ins.IsNew(KEY_INPUT_D)) { dir = { 1.0f, 0.0f, 0.0f }; }
+	}
+	else
+	{
+		// 接続されているゲームパッド１の情報を取得
+		InputManager::JOYPAD_IN_STATE padState =
+			ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+		// アナログキーの入力値から方向を取得
+		dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
 	}
 
+
+	if (!AsoUtility::EqualsVZero(dir))
+	{
+		// XYZの回転行列
+	   // XZ平面移動にする場合は、XZの回転を考慮しないようにする
+		MATRIX mat = MGetIdent();
+		//mat = MMult(mat, MGetRotX(angles_.x));
+		mat = MMult(mat, MGetRotY(camAngles.y));
+		//mat = MMult(mat, MGetRotZ(angles_.z));
+		// 回転行列を使用して、ベクトルを回転させる
+		VECTOR moveDir = VTransform(dir, mat);
+
+		// 回転行列を使用して、ベクトルを回転させる
+		moveDir_ = VTransform(dir, mat);
+		// 移動方向から角度に変換する
+		//angles_.y = atan2f(moveDir_.x, moveDir_.z);
+		// 方向×スピードで移動量を作って、座標に足して移動
+		pos_ = VAdd(pos_, VScale(moveDir_, MOVE_SPEED_HALF));
+
+		//animationController_->Play(static_cast<int>(ANIM_TYPE::WALK));
+
+
+	}
+	else
+	{
+		//animationController_->Play(static_cast<int>(ANIM_TYPE::IDLE));
+	}
 }
 void Player::AvoidMove()
 {
-	InputManager& ins = InputManager::GetInstance();
-	//
-	VECTOR moveDir = AsoUtility::VECTOR_ZERO;
-	if (ins.IsNew(KEY_INPUT_W)) { moveDir = VAdd(moveDir, AsoUtility::DIR_F); }
-	if (ins.IsNew(KEY_INPUT_S)) { moveDir = VAdd(moveDir, AsoUtility::DIR_B); }
-	if (ins.IsNew(KEY_INPUT_A)) { moveDir = VAdd(moveDir, AsoUtility::DIR_L); }
-	if (ins.IsNew(KEY_INPUT_D)) { moveDir = VAdd(moveDir, AsoUtility::DIR_R); }
-	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLX < 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_L); }
-	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLX > 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_R); }
-	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY < 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_F); }
-	if (ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1).AKeyLY > 0) { moveDir = VAdd(moveDir, AsoUtility::DIR_B); }
+	VECTOR camPos = camera_->GetPos();
+	VECTOR camAngles = camera_->GetAngles();
 
-	if (!AsoUtility::EqualsVZero(moveDir))
+
+	auto& ins = InputManager::GetInstance();
+	VECTOR dir = AsoUtility::VECTOR_ZERO;
+
+	// ゲームパッドが接続数で処理を分ける
+	if (GetJoypadNum() == 0)
 	{
+		// WASDで移動する
+		if (ins.IsNew(KEY_INPUT_W)) { dir = { 0.0f, 0.0f, 1.0f }; }
+		if (ins.IsNew(KEY_INPUT_A)) { dir = { -1.0f, 0.0f, 0.0f }; }
+		if (ins.IsNew(KEY_INPUT_S)) { dir = { 0.0f, 0.0f, -1.0f }; }
+		if (ins.IsNew(KEY_INPUT_D)) { dir = { 1.0f, 0.0f, 0.0f }; }
+	}
+	else
+	{
+		// 接続されているゲームパッド１の情報を取得
+		InputManager::JOYPAD_IN_STATE padState =
+			ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+		// アナログキーの入力値から方向を取得
+		dir = ins.GetDirectionXZAKey(padState.AKeyLX, padState.AKeyLY);
+	}
 
-		moveDir = VNorm(moveDir);
 
-		moveDir_ = moveDir;
-		rot_.y = atan2(moveDir_.x, moveDir_.z) + DX_PI_F;
+	if (!AsoUtility::EqualsVZero(dir))
+	{
+		// XYZの回転行列
+	   // XZ平面移動にする場合は、XZの回転を考慮しないようにする
+		MATRIX mat = MGetIdent();
+		//mat = MMult(mat, MGetRotX(angles_.x));
+		mat = MMult(mat, MGetRotY(camAngles.y));
+		//mat = MMult(mat, MGetRotZ(angles_.z));
+		// 回転行列を使用して、ベクトルを回転させる
+		VECTOR moveDir = VTransform(dir, mat);
 
-		//
-		VECTOR movePos = VScale(moveDir_, AVOID_SPEED);
-		//
-		pos_ = VAdd(pos_, movePos);
+		// 回転行列を使用して、ベクトルを回転させる
+		moveDir_ = VTransform(dir, mat);
+		// 移動方向から角度に変換する
+		//angles_.y = atan2f(moveDir_.x, moveDir_.z);
+		// 方向×スピードで移動量を作って、座標に足して移動
+		pos_ = VAdd(pos_, VScale(moveDir_, AVOID_SPEED));
 
-		//angles_.y = AsoUtility::Deg2RadF(180.0f);
-		MV1SetPosition(model_, pos_);
+		//animationController_->Play(static_cast<int>(ANIM_TYPE::WALK));
 
-		MV1SetRotationXYZ(model_, rot_);
+
+	}
+	else
+	{
+		//animationController_->Play(static_cast<int>(ANIM_TYPE::IDLE));
 	}
 
 }
@@ -368,6 +445,16 @@ bool Player::IsCollisionState(void)
 	}
 	return false;
 }
+
+
+void Player::DelayRotate(void)
+{
+	// 移動方向から角度に変換する
+	float goal = atan2f(moveDir_.x, moveDir_.z);
+	// 常に最短経路で補間
+	rot_.y = AsoUtility::LerpAngle(rot_.y, goal, 0.2f);
+}
+
 // ゲッターセッター＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 VECTOR Player::GetPos()
 {

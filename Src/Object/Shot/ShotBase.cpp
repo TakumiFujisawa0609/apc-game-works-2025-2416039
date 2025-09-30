@@ -81,15 +81,7 @@ ShotBase::TYPE ShotBase::GetType(void)
 {
     return type_;
 }
-bool ShotBase::IsCollisionState(void)
-{
-    // ショットの状態が衝突判定を行う状態かどうか
-    if (state_ == ShotBase::STATE::SHOT)
-    {
-        return true;
-    }
-    return false;
-}
+
 void ShotBase::SetParam(void)
 {
 }

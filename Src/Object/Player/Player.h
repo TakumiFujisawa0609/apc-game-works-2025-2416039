@@ -1,4 +1,7 @@
 #pragma once
+
+class Camera;
+
 class Player
 {
 public:
@@ -50,6 +53,7 @@ private:
 	int model_;//モデル
 	VECTOR pos_;//位置
 	VECTOR rot_;//回転
+	VECTOR localrot_;//ローカル回転
 	VECTOR scale_;//大きさ
 	STATE state_;//状態
 	int hp_;//体力
@@ -62,11 +66,14 @@ private:
 	float collisionRadius_;//当たり判定用半径
 
 
+
+	Camera* camera_;
+
 public:
 	Player();
 	~Player();
 	//初期化
-	void Init();
+	void Init(Camera*camera);
 	//ステイトチェンジ
 	void ChangeStandby();
 	void ChangeAvoid();
@@ -115,5 +122,8 @@ public:
 	void SetGp(int gp);
 
 	float GetCollisionRadius();
+
+
+	void DelayRotate();
 };
 
