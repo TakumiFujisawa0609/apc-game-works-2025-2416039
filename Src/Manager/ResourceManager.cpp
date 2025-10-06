@@ -28,6 +28,7 @@ void ResourceManager::Init(void)
 	static std::string PATH_IMG = Application::PATH_IMAGE;
 	static std::string PATH_MDL = Application::PATH_MODEL;
 	static std::string PATH_EFF = Application::PATH_EFFECT;
+	static std::string PATH_SND = Application::PATH_SOUND;
 
 	std::unique_ptr<Resource> res;
 
@@ -39,6 +40,9 @@ void ResourceManager::Init(void)
 	//エフェクト
 	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Effect/Fireball.mv1");
 	resourcesMap_.emplace(SRC::EFFCT1, std::move(res));
+
+	res = std::make_unique<RES>(RES_T::SOUND, PATH_SND + "SE/回避.mp3");
+	resourcesMap_.emplace(SRC::AVOID, std::move(res));
 	
 }
 
@@ -80,6 +84,7 @@ int ResourceManager::LoadModelDuplicate(SRC src)
 	int duId = MV1DuplicateModel(res.handleId_);
 	res.duplicateModelIds_.push_back(duId);
 
+	
 	return duId;
 }
 

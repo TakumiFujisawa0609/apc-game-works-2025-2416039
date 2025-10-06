@@ -37,11 +37,14 @@ public:
 	static constexpr float MOVE_SPEED_HALF = 5.0f; //移動速度半分
 	static constexpr float AVOID_SPEED = 30.0f; //回避速度
 
+	static constexpr float LOST_HP = 20.0f;//HP消費量
+
+
 	static constexpr float MAX_HP = 100; //最大体力
 	static constexpr float MAX_SP = 100; //最大スタミナ
 	static constexpr float MAX_GP = 100; //最大ガード
-
-	static constexpr float MAX_COUNT = 5.0f; //カウントの最大値
+	static constexpr float MAX_PARRY_COUNT = 5.0f; //カウントの最大値
+	static constexpr float MAX_AVOID_DELAY = 3.0f;//回避遅延
 	
 	static constexpr float DAMAGE_RADIUS = 60.0f;//ダメージ時の半径
 	static constexpr float AVOID_RADIUS = 80.0f;//回避時の半径
@@ -64,10 +67,13 @@ private:
 	VECTOR moveDir_;//移動方向
 	bool isAlive_;//生存フラグ
 	int invCnt_;//無敵カウント
-	float count_;
-
+	float parryCount_;
+	bool trgAvoid_;
+	float avoidDelay_;
 	float collisionRadius_;//当たり判定用半径
 
+	//SE
+	int avoidSE_;
 
 
 	Camera* camera_;

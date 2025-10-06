@@ -9,7 +9,7 @@ class EnemyManager
 {
 public:
 
-	static constexpr int MAX_W = 1;
+	static constexpr int MAX_W = 5;
 
 
 	// 敵の生成ウェーブ

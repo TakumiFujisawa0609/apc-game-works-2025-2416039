@@ -3,6 +3,7 @@
 #include "../../Utility/MatrixUtility.h"
 #include "../../Manager/InputManager.h"
 #include "../../Manager/ResourceManager.h"
+#include "../../Manager/SoundManager.h"
 #include "../Camera/Camera.h"
 #include "Player.h"
 
@@ -29,6 +30,9 @@ void Player::Init(Camera* camera)
 
 	
 	model_ = res.Load(ResourceManager::SRC::PlayerModel).handleId_;
+
+	avoidSE_ = res.Load(ResourceManager::SRC::AVOID).handleId_;
+
 	// 初期位置
 	pos_ = { 0.0f, 50.0f, 0.0f };
 	// 初期回転
@@ -45,6 +49,7 @@ void Player::Init(Camera* camera)
 	// 初期ガード
 	gp_ = MAX_GP;
 
+	trgAvoid_ = false;
 
 	// 生存フラグ
 	isAlive_ = true;
@@ -66,13 +71,14 @@ void Player::ChangeStandby()
 
 void Player::ChangeAvoid()
 {
+	
 }
 void Player::ChangeGuard()
 {
 }
 void Player::ChangeParry()
 {
-	count_ = 0.0f;
+	parryCount_ = 0.0f;
 }
 void Player::ChangeDamage()
 {
@@ -117,17 +123,31 @@ void Player::Update()
 // ステイトアプデ
 void Player::StandbyUpdate()
 {
+	
 	auto& ins = InputManager::GetInstance();
 	Move();
 	DelayRotate();
 	if (sp_ > 25.0f)
 	{
-		if (ins.IsTrgDown(KEY_INPUT_LSHIFT))
+		
+		if (ins.IsTrgDown(KEY_INPUT_LSHIFT)|| ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 		{
-			ChangeState(STATE::AVOID);
+			
+			auto& ins = SoundManager::GetInstance();
+			
+			trgAvoid_ = true;
+			
+			ins.PlaySE(avoidSE_);
+			
 		}
-		if (ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+		if (trgAvoid_)
 		{
+			avoidDelay_++;
+		}
+		if (avoidDelay_ > MAX_AVOID_DELAY)
+		{
+			trgAvoid_ = false;
+			avoidDelay_ = 0.0f;
 			ChangeState(STATE::AVOID);
 		}
 	}
@@ -165,6 +185,7 @@ void Player::AvoidUpdate()
 		rot_.x = 0.0f;
 		ChangeState(STATE::STANDBY);
 	}
+
 }
 
 	
@@ -173,6 +194,12 @@ void Player::GuardUpdate()
 	auto& ins = InputManager::GetInstance();
 	HalfMove();
 	DelayRotate();
+
+	if (gp_ <= 0.0f)
+	{
+		ChangeState(STATE::STANDBY);
+	}
+
 	if (ins.IsTrgUp(KEY_INPUT_SPACE))
 	{
 		ChangeState(STATE::PARRY);
@@ -184,10 +211,10 @@ void Player::GuardUpdate()
 }
 void Player::ParryUpdate()
 {
-	count_ += 0.5f;
+	parryCount_ += 0.5f;
 	HalfMove();
 	DelayRotate();
-	if (count_ >= MAX_COUNT)
+	if (parryCount_ >= MAX_PARRY_COUNT)
 	{
 		ChangeState(STATE::STANDBY);
 	}
@@ -536,13 +563,14 @@ void Player::Hit(bool is)
 		{
 
 			ChangeState(STATE::DAMAGE);
+			hp_ -= 25;
 			isAlive_ = false;
 			isHit = false;
 		}
 
 		if (state_ == STATE::GUARD)
 		{
-			gp_-=10.0f;
+			gp_-=20.0f;
 			
 		}
 		if (state_ == STATE::PARRY)

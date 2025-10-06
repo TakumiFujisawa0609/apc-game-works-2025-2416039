@@ -15,6 +15,7 @@ public:
 		PlayerModel,
 		EnemyW,
 		EFFCT1,
+		AVOID,
 	};
 
 	// 明示的にインステンスを生成する

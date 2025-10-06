@@ -3,6 +3,7 @@
 #include "Manager/InputManager.h"
 #include "Manager/ResourceManager.h"
 #include "Manager/SceneManager.h"
+#include "Manager/SoundManager.h"
 #include "Fps/FpsControll.h"
 #include "Application.h"
 
@@ -11,6 +12,7 @@ Application* Application::instance_ = nullptr;
 const std::string Application::PATH_IMAGE = "Data/Image/";
 const std::string Application::PATH_MODEL = "Data/Model/";
 const std::string Application::PATH_EFFECT = "Data/Effect/";
+const std::string Application::PATH_SOUND = "Data/Sound/";
 
 void Application::CreateInstance(void)
 {
@@ -57,6 +59,8 @@ void Application::Init(void)
 
 	// ƒV[ƒ“ŠÇ—‰Šú‰»
 	SceneManager::CreateInstance();
+
+	SoundManager::CreateInstance();
 
 	exitFlag_ = false;
 }
