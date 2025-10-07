@@ -37,7 +37,12 @@ public:
 	static constexpr float MOVE_SPEED_HALF = 5.0f; //移動速度半分
 	static constexpr float AVOID_SPEED = 30.0f; //回避速度
 
+	static constexpr float AVOID_ROLL = 20.0f;//回避回転量
+	static constexpr float AVOID_MAX_ROLL = 360.0f;//回避最大回転量
+
 	static constexpr float LOST_HP = 20.0f;//HP消費量
+	static constexpr float LOST_SP = 25.0f;//SP消費量
+	static constexpr float LOST_GP = 20.0f;//GP消費量
 
 
 	static constexpr float MAX_HP = 100; //最大体力
@@ -57,6 +62,7 @@ private:
 
 	int model_;//モデル
 	VECTOR pos_;//位置
+	VECTOR hitPos_;
 	VECTOR rot_;//回転
 	VECTOR localrot_;//ローカル回転
 	VECTOR scale_;//大きさ
@@ -120,16 +126,19 @@ public:
 	void AvoidMove();
 	bool IsCollisionState(void);
 	void Hit(bool is);
+	
+
 	//ゲッターセッター
 	VECTOR GetPos();
 	void SetPos(VECTOR pos);
+	VECTOR GetHitPos();
 	int GetHp();
 	void SetHp(int hp);
 	int GetSp();
 	void SetSp(int sp);
 	int GetGp();
 	void SetGp(int gp);
-
+	STATE GetState();
 	float GetCollisionRadius();
 
 

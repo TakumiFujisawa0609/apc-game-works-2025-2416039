@@ -15,7 +15,7 @@ public:
 	void Init(Player*player, EnemyManager* enemyManager);
 	void Update(void);
 	bool HitSphere(VECTOR pos1, float radius1, VECTOR pos2, float radius2);
-
+	float Length(VECTOR pos1, VECTOR pos2);
 private:
 
 	Player* player_;

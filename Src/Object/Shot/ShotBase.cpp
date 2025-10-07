@@ -102,3 +102,8 @@ float ShotBase::GetRadius(void)
 {
     return collisionRadius_;
 }
+
+void ShotBase::ReDir(void)
+{
+    dir_ = VScale(dir_, -1.0f);
+}

@@ -35,6 +35,7 @@ void Player::Init(Camera* camera)
 
 	// 初期位置
 	pos_ = { 0.0f, 50.0f, 0.0f };
+	hitPos_ = { pos_.x,0.0f,pos_.z };
 	// 初期回転
 	rot_ = { 0.0f, 0.0f, 0.0f };
 
@@ -90,6 +91,7 @@ void Player::ChangeDead()
 // アプデ
 void Player::Update()
 {
+	
 	switch (state_)
 	{
 	case Player::STATE::STANDBY:
@@ -119,6 +121,7 @@ void Player::Update()
 	// 回転行列をモデルに反映
 	MV1SetRotationMatrix(model_, mat);
 
+	hitPos_ = { pos_.x,0.0f,pos_.z };
 }
 // ステイトアプデ
 void Player::StandbyUpdate()
@@ -127,7 +130,7 @@ void Player::StandbyUpdate()
 	auto& ins = InputManager::GetInstance();
 	Move();
 	DelayRotate();
-	if (sp_ > 25.0f)
+	if (sp_ > LOST_SP)
 	{
 		
 		if (ins.IsTrgDown(KEY_INPUT_LSHIFT)|| ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
@@ -177,10 +180,10 @@ void Player::StandbyUpdate()
 
 void Player::AvoidUpdate()
 {
-	rot_.x += AsoUtility::Deg2RadF(20.0f);
+	rot_.x += AsoUtility::Deg2RadF(AVOID_ROLL);
 	AvoidMove();
 	DelayRotate();
-	if (rot_.x >= AsoUtility::Deg2RadF(360.0f))
+	if (rot_.x >= AsoUtility::Deg2RadF(AVOID_MAX_ROLL))
 	{
 		rot_.x = 0.0f;
 		ChangeState(STATE::STANDBY);
@@ -302,7 +305,7 @@ void Player::Draw()
 void Player::StandbyDraw()
 {
 	MV1DrawModel(model_);
-	DrawSphere3D(pos_, DAMAGE_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
+	DrawSphere3D(hitPos_, DAMAGE_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
 
 	collisionRadius_ = DAMAGE_RADIUS;
 }
@@ -310,21 +313,21 @@ void Player::StandbyDraw()
 void Player::AvoidDraw()
 {
 	MV1DrawModel(model_);
-	DrawSphere3D(pos_, AVOID_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
+	DrawSphere3D(hitPos_, AVOID_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
 
 	collisionRadius_ = AVOID_RADIUS;
 }
 
 void Player::GuardDraw()
 {
-	DrawSphere3D(pos_, GUARD_RADIUS, TEN+SIX, 0x0000ff, 0x0000ff, false);
+	DrawSphere3D(hitPos_, GUARD_RADIUS, TEN+SIX, 0x0000ff, 0x0000ff, false);
 	collisionRadius_ = GUARD_RADIUS;
 	MV1DrawModel(model_);
 }
 
 void Player::ParryDraw()
 {
-	DrawSphere3D(pos_, PARRY_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
+	DrawSphere3D(hitPos_, PARRY_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
 	collisionRadius_ = PARRY_RADIUS;
 	MV1DrawModel(model_);
 }
@@ -563,14 +566,14 @@ void Player::Hit(bool is)
 		{
 
 			ChangeState(STATE::DAMAGE);
-			hp_ -= 25;
+			hp_ -= LOST_HP;
 			isAlive_ = false;
 			isHit = false;
 		}
 
 		if (state_ == STATE::GUARD)
 		{
-			gp_-=20.0f;
+			gp_-=LOST_GP;
 			
 		}
 		if (state_ == STATE::PARRY)
@@ -579,7 +582,7 @@ void Player::Hit(bool is)
 		}
 		if (state_ == STATE::AVOID)
 		{
-			sp_ -= 25.0f;
+			sp_ -= LOST_SP;
 		}
 	}
 
@@ -603,6 +606,11 @@ VECTOR Player::GetPos()
 void Player::SetPos(VECTOR pos)
 {
 	pos_ = pos;
+}
+
+VECTOR Player::GetHitPos()
+{
+	return hitPos_;
 }
 
 int Player::GetHp()
@@ -633,6 +641,11 @@ int Player::GetGp()
 void Player::SetGp(int gp)
 {
 	gp_ = gp;
+}
+
+Player::STATE Player::GetState()
+{
+	return state_;
 }
 
 float Player::GetCollisionRadius()

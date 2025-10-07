@@ -218,6 +218,11 @@ VECTOR EnemyBase::GetPos(void)
 	return pos_;
 }
 
+void EnemyBase::SetPos(VECTOR pos)
+{
+	pos_ = pos;
+}
+
 float EnemyBase::GetRadius(void)
 {
 	return 0.0f;

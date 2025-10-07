@@ -35,6 +35,9 @@ public:
 
 
 	float GetRadius(void);
+
+	void ReDir(void);
+
 protected:
 	// ’e‚ÌŽí•Ê
 	TYPE type_;

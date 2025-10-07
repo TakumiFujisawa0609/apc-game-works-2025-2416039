@@ -113,6 +113,7 @@ public:
 	void ChangeState(STATE state);
 
 	VECTOR GetPos(void);
+	void SetPos(VECTOR pos);
 
 	float GetRadius(void);
 
