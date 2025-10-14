@@ -8,14 +8,18 @@ class Collision;
 class Player;
 class Camera;
 class Grid;
+class Timer;
 
 class GameScene : public SceneBase
 {
 
 public:
-	
+	static constexpr int MAX_COUNT = 5;
+	static constexpr float MAX_SLOW_TIME = 600.0f;
+	static constexpr int MAX_SLOW_COUNT = 3;
+
 	// コンストラクタ
-	GameScene(void);
+	GameScene(Timer*timer);
 
 	// デストラクタ
 	~GameScene(void);
@@ -23,6 +27,8 @@ public:
 	void Init(void) override;
 	void Update(void) override;
 	void Draw(void) override;
+
+	void SetIsSlow(bool isSlow);
 
 private:
 
@@ -42,5 +48,12 @@ private:
 	//当たり判定
 	Collision* collision_;
 
-	
+	//タイマー
+	Timer* timer_;
+
+	int count_;
+
+	float slowTime_;
+	int slowCount_;
+	bool isSlow_;
 };

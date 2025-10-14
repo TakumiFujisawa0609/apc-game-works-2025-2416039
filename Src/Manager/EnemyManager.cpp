@@ -33,18 +33,24 @@ void EnemyManager::Init(void)
 		res.Load(ResourceManager::SRC::EFFCT1).handleId_);
 
 	sponCuntW_ = 0;
+	sponDilay_ = 0;
 }
 
 void EnemyManager::Update(void)
 {
+	sponDilay_++;
 	if (sponCuntW_ < MAX_W)
 	{
+		if (sponDilay_ > MAX_DILAY)
+		{
 
-		EnemyBase* enemy_ = new EnemyWizard();
-		enemy_->Init(EnemyBase::TYPE::WIZARD,
-			enemyModelIds_[static_cast<int>(EnemyBase::TYPE::WIZARD)], attackEffectModelIds_[static_cast<int>(ShotBase::TYPE::STRAIGHT)], player_);
-		enemys_.push_back(enemy_);
-		sponCuntW_++;
+			EnemyBase* enemy_ = new EnemyWizard();
+			enemy_->Init(EnemyBase::TYPE::WIZARD,
+				enemyModelIds_[static_cast<int>(EnemyBase::TYPE::WIZARD)], attackEffectModelIds_[static_cast<int>(ShotBase::TYPE::STRAIGHT)], player_);
+			enemys_.push_back(enemy_);
+			sponCuntW_++;
+			sponDilay_ = 0;
+		}
 	}
 
 	for (EnemyBase* enemy : enemys_)

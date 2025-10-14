@@ -9,11 +9,12 @@
 #include "../Object/Camera/Camera.h"
 #include "../Object/Grid/Grid.h"
 #include "../Object/Player/Player.h"
+#include "../Object/Timer/Timer.h"
 #include "GameScene.h"
 
-GameScene::GameScene(void)
+GameScene::GameScene(Timer*timer)
 {
-	
+	timer_ = timer;
 }
 
 GameScene::~GameScene(void)
@@ -42,25 +43,70 @@ void GameScene::Init(void)
 	//Init
 	camera_->Init(player_);
 	grid_->Init();
-	player_->Init(camera_);
+	player_->Init(camera_,this);
 	enemyManager_->Init();
 	collision_->Init(player_,enemyManager_);
 
 	camera_->ChangeMode(Camera::MODE::FOLLOW);
+
+	count_ = 0;
+	slowTime_ = 0.0f;
+	slowCount_ = 0;
+	isSlow_ = false;
 }
 
 void GameScene::Update(void)
 {
+	count_++;
 	InputManager& ins = InputManager::GetInstance();
 	player_->Update();
-	enemyManager_->Update();
+	if (isSlow_)
+	{
+		slowTime_+= 1.0f;
+		if (slowTime_ <= MAX_SLOW_TIME)
+		{
+			slowCount_++;
+		}
+		if (slowCount_ >= MAX_SLOW_COUNT)
+		{
+			
+			enemyManager_->Update();
+			slowCount_ = 0;
+		}
+		if (slowTime_ >= MAX_SLOW_TIME)
+		{
+			isSlow_ = false;
+			slowTime_ = 0.0f;
+			slowCount_ = 0;
+		}
+	}
+	else
+	{
+		enemyManager_->Update();
+	}
+	
+	
+
+
 	collision_->Update();
 	// シーン遷移
 	if (ins.IsTrgDown(KEY_INPUT_R)||ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::BACK))
 	{
 		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
 	}
+	if (player_->GetHp() <= 0)
+	{
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAMEOVER);
+	}
 
+	if (count_ > MAX_COUNT)
+	{
+		if (timer_->GetMin() <= 0 && timer_->GetSec() <= 0)
+		{
+			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
+		}
+		count_ = MAX_COUNT + 1;
+	}
 }
 
 void GameScene::Draw(void)
@@ -75,7 +121,14 @@ void GameScene::Draw(void)
 	//エネミー
 	enemyManager_->Draw();
 
-	DrawString(0, 100, "Game Scene", 0x000000);
+	DrawString(10, 30, "Game Scene", 0x000000);
+
+	DrawString(130, 10, "ESC（START）でメニュー", 0x000000);
+}
+
+void GameScene::SetIsSlow(bool isSlow)
+{
+	isSlow_ = isSlow;
 }
 
 

@@ -74,9 +74,13 @@ private:
 
 	
 	// 初期位置
+	
 	VECTOR pos_;
+	VECTOR shotPos_;
+
 	// 初期角度
 	VECTOR angles_;
+	
 	// アニメーションコントローラー
 	//AnimationController* animationController_;
 

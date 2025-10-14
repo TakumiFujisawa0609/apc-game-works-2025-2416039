@@ -114,6 +114,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(DXLIB_DIR)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -131,6 +132,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(DXLIB_DIR)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -162,6 +164,9 @@
     <ClInclude Include="Src\Object\Grid\Grid.h" />
     <ClInclude Include="Src\Object\Shot\ShotBase.h" />
     <ClInclude Include="Src\Object\Shot\ShotStraight.h" />
+    <ClInclude Include="Src\Object\Timer\Timer.h" />
+    <ClInclude Include="Src\Scene\ClearScene.h" />
+    <ClInclude Include="Src\Scene\GameOvera.h" />
     <ClInclude Include="Src\Scene\GameScene.h" />
     <ClInclude Include="Src\Scene\SceneBase.h" />
     <ClInclude Include="Src\Scene\TitleScene.h" />
@@ -191,6 +196,9 @@
     <ClCompile Include="Src\Object\Grid\Grid.cpp" />
     <ClCompile Include="Src\Object\Shot\ShotBase.cpp" />
     <ClCompile Include="Src\Object\Shot\ShotStraight.cpp" />
+    <ClCompile Include="Src\Object\Timer\Timer.cpp" />
+    <ClCompile Include="Src\Scene\ClearScene.cpp" />
+    <ClCompile Include="Src\Scene\GameOvera.cpp" />
     <ClCompile Include="Src\Scene\GameScene.cpp" />
     <ClCompile Include="Src\Scene\SceneBase.cpp" />
     <ClCompile Include="Src\Scene\TitleScene.cpp" />

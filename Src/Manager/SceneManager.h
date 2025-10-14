@@ -6,7 +6,7 @@
 #define mainCamera SceneManager::GetInstance().GetCamera().lock()
 
 class SceneBase;
-
+class Timer;
 class Fader;
 
 class SceneManager
@@ -21,6 +21,8 @@ public:
 		
 		TITLE,
 		GAME,
+		GAMEOVER,
+		CLEAR,
 		
 	};
 
@@ -57,6 +59,8 @@ public:
 	// デルタタイムの取得
 	float GetDeltaTime(void) const;
 
+
+
 	//// カメラの取得
 	//Camera* GetCamera(void) const;
 
@@ -90,6 +94,10 @@ private:
 
 	// 各種シーン
 	std::unique_ptr<Fader> fader_;
+
+	//タイマー
+	Timer* timer_;
+
 
 	MANEW_SERECT manewSerect_;
 

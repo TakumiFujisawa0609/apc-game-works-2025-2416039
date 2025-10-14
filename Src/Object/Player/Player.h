@@ -1,6 +1,7 @@
 #pragma once
 
 class Camera;
+class GameScene;
 
 class Player
 {
@@ -41,12 +42,12 @@ public:
 	static constexpr float AVOID_MAX_ROLL = 360.0f;//回避最大回転量
 
 	static constexpr float LOST_HP = 20.0f;//HP消費量
-	static constexpr float LOST_SP = 25.0f;//SP消費量
+	static constexpr float LOST_SP = 30.0f;//SP消費量
 	static constexpr float LOST_GP = 20.0f;//GP消費量
 
 
 	static constexpr float MAX_HP = 100; //最大体力
-	static constexpr float MAX_SP = 100; //最大スタミナ
+	static constexpr float MAX_SP = 90; //最大スタミナ
 	static constexpr float MAX_GP = 100; //最大ガード
 	static constexpr float MAX_PARRY_COUNT = 5.0f; //カウントの最大値
 	static constexpr float MAX_AVOID_DELAY = 3.0f;//回避遅延
@@ -62,7 +63,6 @@ private:
 
 	int model_;//モデル
 	VECTOR pos_;//位置
-	VECTOR hitPos_;
 	VECTOR rot_;//回転
 	VECTOR localrot_;//ローカル回転
 	VECTOR scale_;//大きさ
@@ -84,11 +84,13 @@ private:
 
 	Camera* camera_;
 
+	GameScene* game_;
+
 public:
 	Player();
 	~Player();
 	//初期化
-	void Init(Camera*camera);
+	void Init(Camera*camera,GameScene*game);
 	//ステイトチェンジ
 	void ChangeStandby();
 	void ChangeAvoid();
@@ -131,7 +133,6 @@ public:
 	//ゲッターセッター
 	VECTOR GetPos();
 	void SetPos(VECTOR pos);
-	VECTOR GetHitPos();
 	int GetHp();
 	void SetHp(int hp);
 	int GetSp();

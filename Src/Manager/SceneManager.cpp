@@ -1,13 +1,17 @@
 #include <chrono>
 #include <DxLib.h>
 #include <EffekseerForDXLib.h>
+#include "ResourceManager.h"
+#include "InputManager.h"
+#include "../Application.h"
 #include "../Common/Fader.h"
 #include "../Scene/TitleScene.h"
 #include "../Scene/GameScene.h"
-#include "ResourceManager.h"
+#include "../Scene/ClearScene.h"
+#include "../Scene/GameOvera.h"
+#include "../Object/Timer/Timer.h"
+
 #include "SceneManager.h"
-#include "InputManager.h"
-#include "../Application.h"
 
 SceneManager* SceneManager::instance_ = nullptr;
 
@@ -35,8 +39,11 @@ void SceneManager::Init(void)
 	// フェード機能の初期化
 	fader_ = std::make_unique<Fader>();
 
+	// タイマー機能の初期化
+	timer_ = new Timer();
+
 	//Init
-	
+	timer_->Init();
 	fader_->Init();
 
 	delayCount_ = DELAY_MAX;
@@ -94,6 +101,7 @@ void SceneManager::Update(void)
 
 	if (ins.IsTrgDown(KEY_INPUT_ESCAPE) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::START))
 	{
+		timer_->Stop();
 		manew_ = true;
 
 	}
@@ -202,6 +210,7 @@ void SceneManager::Update(void)
 		if (!manew_)
 		{
 			scene_->Update();
+			timer_->Update();
 		}
 	}
 
@@ -232,6 +241,11 @@ void SceneManager::Draw(void)
 
 	// 描画
 	scene_->Draw();
+
+	if (sceneId_ != SCENE_ID::TITLE)
+	{
+		timer_->Draw();
+	}
 
 	// Effekseerにより再生中のエフェクトを描画する。
 	DrawEffekseer3D();
@@ -367,9 +381,21 @@ void SceneManager::DoChangeScene(SCENE_ID sceneId)
 	{
 	case SCENE_ID::TITLE:
 		scene_ = std::make_unique<TitleScene>();
+		timer_->Reset();
 		break;
 	case SCENE_ID::GAME:
-		scene_ = std::make_unique<GameScene>();
+		scene_ = std::make_unique<GameScene>(timer_);
+		timer_->Start(120.0f);
+		break;
+	case SCENE_ID::CLEAR:
+		scene_ = std::make_unique<ClearScene>(timer_);
+		timer_->Reset();
+		timer_->Start(30.0f);
+		break;
+	case SCENE_ID::GAMEOVER:
+		scene_ = std::make_unique<GameOvera>(timer_);
+		timer_->Reset();
+		timer_->Start(30.0f);
 		break;
 	}
 

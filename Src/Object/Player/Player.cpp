@@ -4,6 +4,7 @@
 #include "../../Manager/InputManager.h"
 #include "../../Manager/ResourceManager.h"
 #include "../../Manager/SoundManager.h"
+#include "../../Scene/GameScene.h"
 #include "../Camera/Camera.h"
 #include "Player.h"
 
@@ -16,9 +17,9 @@ Player::~Player()
 
 }
 // 初期化
-void Player::Init(Camera* camera)
+void Player::Init(Camera* camera, GameScene* game)
 {
-
+	game_ = game;
 	camera_ = camera;
 
 	// 初期ステイト
@@ -35,7 +36,7 @@ void Player::Init(Camera* camera)
 
 	// 初期位置
 	pos_ = { 0.0f, 50.0f, 0.0f };
-	hitPos_ = { pos_.x,0.0f,pos_.z };
+	
 	// 初期回転
 	rot_ = { 0.0f, 0.0f, 0.0f };
 
@@ -121,7 +122,7 @@ void Player::Update()
 	// 回転行列をモデルに反映
 	MV1SetRotationMatrix(model_, mat);
 
-	hitPos_ = { pos_.x,0.0f,pos_.z };
+	
 }
 // ステイトアプデ
 void Player::StandbyUpdate()
@@ -225,8 +226,17 @@ void Player::ParryUpdate()
 }
 void Player::DamageUpdate()
 {
+	auto& ins = InputManager::GetInstance();
 	Move();
 	DelayRotate();
+	if (sp_ > LOST_SP)
+	{
+
+		if (ins.IsTrgDown(KEY_INPUT_LSHIFT) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
+		{
+			AvoidMove();
+		}
+	}
 	if (isAlive_ == false)
 	{
 		isAlive_ = true;
@@ -305,7 +315,7 @@ void Player::Draw()
 void Player::StandbyDraw()
 {
 	MV1DrawModel(model_);
-	DrawSphere3D(hitPos_, DAMAGE_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
+	DrawSphere3D(pos_, DAMAGE_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
 
 	collisionRadius_ = DAMAGE_RADIUS;
 }
@@ -313,21 +323,21 @@ void Player::StandbyDraw()
 void Player::AvoidDraw()
 {
 	MV1DrawModel(model_);
-	DrawSphere3D(hitPos_, AVOID_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
+	DrawSphere3D(pos_, AVOID_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
 
 	collisionRadius_ = AVOID_RADIUS;
 }
 
 void Player::GuardDraw()
 {
-	DrawSphere3D(hitPos_, GUARD_RADIUS, TEN+SIX, 0x0000ff, 0x0000ff, false);
+	DrawSphere3D(pos_, GUARD_RADIUS, TEN+SIX, 0x0000ff, 0x0000ff, false);
 	collisionRadius_ = GUARD_RADIUS;
 	MV1DrawModel(model_);
 }
 
 void Player::ParryDraw()
 {
-	DrawSphere3D(hitPos_, PARRY_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
+	DrawSphere3D(pos_, PARRY_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
 	collisionRadius_ = PARRY_RADIUS;
 	MV1DrawModel(model_);
 }
@@ -579,10 +589,21 @@ void Player::Hit(bool is)
 		if (state_ == STATE::PARRY)
 		{
 			gp_ += 10.0f;
+			if (gp_ > MAX_GP)
+			{
+				gp_ = MAX_GP;
+			}
 		}
 		if (state_ == STATE::AVOID)
 		{
+			
+			if (sp_ < 0.0f)
+			{
+				
+				return;
+			}
 			sp_ -= LOST_SP;
+			game_->SetIsSlow(true);
 		}
 	}
 
@@ -608,10 +629,6 @@ void Player::SetPos(VECTOR pos)
 	pos_ = pos;
 }
 
-VECTOR Player::GetHitPos()
-{
-	return hitPos_;
-}
 
 int Player::GetHp()
 {

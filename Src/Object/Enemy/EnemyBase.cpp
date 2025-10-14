@@ -2,6 +2,7 @@
 #include <math.h>
 #include "../../Application.h"
 #include "../../Utility/AsoUtility.h"
+#include "../../Utility/MatrixUtility.h"
 #include "../../Manager/InputManager.h"
 #include "../../Manager/SceneManager.h"
 //#include "../Common/AnimationController.h"
@@ -254,14 +255,14 @@ void EnemyBase::Damage(int damage)
 	{
 		hp_ = -1;
 	}
-	/*if (hp_ == 0)
+	if (hp_ == 0)
 	{
 		ChangeState(STATE::DEAD_REACT);
 	}
 	if (hp_ > 0)
 	{
 		ChangeState(STATE::HIT_REACT);
-	}*/
+	}
 }
 
 bool EnemyBase::IsCollisionState(void)
@@ -339,7 +340,13 @@ void EnemyBase::ChangeAttack(void)
 	{
 		ShotBase* shot = GetValidShot();
 		// ’e‚ð¶¬
-		shot->CreateShot(pos_, moveDir_);
+
+		VECTOR localPos = { 0.0f,0.0f,-200.0f };
+
+		VECTOR shotPos = VTransform(localPos, MatrixUtility::GetMatrixRotateXYZ(angles_));
+		shotPos_ = VAdd(pos_, shotPos);
+
+		shot->CreateShot(shotPos_, moveDir_);
 	}
 }
 
@@ -415,8 +422,7 @@ void EnemyBase::DrawHitReact()
 
 void EnemyBase::DrawDeadReact()
 {
-	// ƒ‚ƒfƒ‹‚Ì•`‰æ
-	MV1DrawModel(modelId_);
+	
 }
 
 void EnemyBase::DrawEnd()

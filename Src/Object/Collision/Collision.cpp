@@ -41,7 +41,7 @@ void Collision::Update(void)
 			continue;
 		}
 
-		if (HitSphere(player_->GetHitPos(), player_->GetCollisionRadius(), enemy->GetPos(), enemy->GetRadius()))
+		if (HitSphere(player_->GetPos(), player_->GetCollisionRadius(), enemy->GetPos(), enemy->GetRadius()))
 		{
 			
 		}
@@ -50,7 +50,7 @@ void Collision::Update(void)
 		shots_ = enemy->GetShot();
 		for (ShotBase* shot : shots_)
 		{
-			if (HitSphere(player_->GetHitPos(), player_->GetCollisionRadius(), shot->GetPos(), shot->GetRadius()))
+			if (HitSphere(player_->GetPos(), player_->GetCollisionRadius(), shot->GetPos(), shot->GetRadius()))
 			{
 				if (shot->IsAlive())
 				{
@@ -64,6 +64,15 @@ void Collision::Update(void)
 						shot->SetIsAlive(false);
 						player_->Hit(true);
 					}
+				}
+			}
+			if (HitSphere(enemy->GetPos(), enemy->GetRadius(), shot->GetPos(), shot->GetCollisionRadius()))
+			{
+				if (shot->IsAlive())
+				{
+
+					shot->SetIsAlive(false);
+					enemy->Damage(1);
 				}
 			}
 		}
