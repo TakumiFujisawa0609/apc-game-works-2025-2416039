@@ -31,7 +31,7 @@ void TitleScene::Update(void)
 	InputManager& ins = InputManager::GetInstance();
 	if (count_ >= 3)
 	{
-		if (ins.IsTrgDown(KEY_INPUT_SPACE))
+		if (ins.IsNew(KEY_INPUT_SPACE))
 		{
 			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::GAME);
 			count_ = 0;

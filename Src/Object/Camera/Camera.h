@@ -23,7 +23,7 @@ public:
 	static constexpr VECTOR DERFAULT_ANGLES = { 0.0f, 0.0f, 0.0f
 	};
 	// カメラのクリップ範囲
-	static constexpr float VIEW_NEAR = 1.0f;
+	static constexpr float VIEW_NEAR = 10.0f;
 	static constexpr float VIEW_FAR = 30000.0f;
 
 

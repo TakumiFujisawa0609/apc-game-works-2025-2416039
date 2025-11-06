@@ -10,6 +10,7 @@
 #include "../Object/Grid/Grid.h"
 #include "../Object/Player/Player.h"
 #include "../Object/Timer/Timer.h"
+#include "../Object/Stage/Stage.h"
 #include "GameScene.h"
 
 GameScene::GameScene(Timer*timer)
@@ -40,12 +41,16 @@ void GameScene::Init(void)
 	//当たり判定機能の初期化
 	collision_ = new Collision();
 
+	stage_=new Stage();
+
 	//Init
 	camera_->Init(player_);
 	grid_->Init();
 	player_->Init(camera_,this);
 	enemyManager_->Init();
 	collision_->Init(player_,enemyManager_);
+	stage_->Init();
+
 
 	camera_->ChangeMode(Camera::MODE::FOLLOW);
 
@@ -60,6 +65,7 @@ void GameScene::Update(void)
 	count_++;
 	InputManager& ins = InputManager::GetInstance();
 	player_->Update();
+	stage_->Update();
 	if (isSlow_)
 	{
 		slowTime_+= 1.0f;
@@ -117,7 +123,7 @@ void GameScene::Draw(void)
 	grid_->Draw();
 	//プレイヤー
 	player_->Draw();
-
+	stage_->Draw();
 	//エネミー
 	enemyManager_->Draw();
 

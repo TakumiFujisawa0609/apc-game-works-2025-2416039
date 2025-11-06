@@ -9,6 +9,7 @@ class Player;
 class Camera;
 class Grid;
 class Timer;
+class Stage;
 
 class GameScene : public SceneBase
 {
@@ -50,6 +51,9 @@ private:
 
 	//タイマー
 	Timer* timer_;
+
+	//ステージ
+	Stage* stage_;
 
 	int count_;
 

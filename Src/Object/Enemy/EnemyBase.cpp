@@ -40,9 +40,9 @@ void EnemyBase::Init(TYPE type, int baseModelId, int baseAttackEffectModelId, Pl
 	// モデルの初期位置
 	SetSpaenPos();
 	// モデルの初期角度
-	angles_ = { 0.0f,AsoUtility::Deg2RadF(180.0f),0.0f };
-	MV1SetRotationXYZ(modelId_, angles_);
-
+	localAngles_ = { 0.0f,AsoUtility::Deg2RadF(180.0f),0.0f };
+	angles_ = { 0.0f,AsoUtility::Deg2RadF(0.0f),0.0f };
+	MV1SetRotationMatrix(modelId_, MatrixUtility::Multiplication(localAngles_, angles_));
 
 	// 初期状態
 	ChangeState(STATE::STANDBY);
@@ -154,7 +154,7 @@ void EnemyBase::LookPlayer(void)
 
 	angles_.y = atan2(moveDir_.x, moveDir_.z) + DX_PI_F;
 	// 角度の設定
-	MV1SetRotationXYZ(modelId_, angles_);
+	MV1SetRotationMatrix(modelId_, MatrixUtility::Multiplication(localAngles_, angles_));
 	MV1SetScale(modelId_, scales_);
 }
 

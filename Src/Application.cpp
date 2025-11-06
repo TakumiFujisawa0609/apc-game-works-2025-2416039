@@ -5,6 +5,7 @@
 #include "Manager/SceneManager.h"
 #include "Manager/SoundManager.h"
 #include "Fps/FpsControll.h"
+#include "05_FPS制御/FpsController.h"
 #include "Application.h"
 
 Application* Application::instance_ = nullptr;
@@ -37,7 +38,8 @@ void Application::Init(void)
 	// ウィンドウサイズ
 	SetGraphMode(SCREEN_SIZE_X, SCREEN_SIZE_Y, 32);
 	ChangeWindowMode(true);
-
+	// FPS制御初期化
+	fpsController_ = new FpsController(FRAME_RATE);
 	// DxLibの初期化
 	SetUseDirect3DVersion(DX_DIRECT3D_11);
 	isInitFail_ = false;
@@ -73,15 +75,17 @@ void Application::Run(void)
 	// ゲームループ
 	while (ProcessMessage() == 0 && (exitFlag_ == false))
 	{
-		FpsControll_Update();
+		//FpsControll_Update();
 		inputManager.Update();
 		sceneManager.Update();
 
 		sceneManager.Draw();
-
+		// 平均FPS描画
+		fpsController_->Draw();
 
 		ScreenFlip();
-		FpsControll_Wait();
+		// 理想FPS経過待ち
+		fpsController_->Wait();
 	}
 
 }
@@ -103,7 +107,8 @@ void Application::Destroy(void)
 	}
 
 	delete instance_;
-
+	// FPS制御メモリ解放
+	delete fpsController_;
 }
 
 bool Application::IsInitFail(void) const

@@ -3,14 +3,13 @@
 #include "../Application.h"
 #include "../Utility/AsoUtility.h"
 #include "../Manager/SceneManager.h"
-#include "../Manager/ResourceManager.h"
 #include "../Manager/InputManager.h"
 #include "../Object/Timer/Timer.h"
 #include "GameOvera.h"
 
 GameOvera::GameOvera(Timer*timer)
 {
-	timer_ = timer;
+		timer_ = timer;
 }
 
 GameOvera::~GameOvera(void)
@@ -48,5 +47,6 @@ void GameOvera::Update(void)
 void GameOvera::Draw(void)
 {
 	DrawString(0, 100, "GameOvera", 0x000000);
-	DrawString(0, 130, "スベース(Bボタン)でタイトル", 0x000000);
+	DrawString(0, 130, "スベース(Aボタン)でリスタート", 0x000000);
 }
+

@@ -9,8 +9,8 @@ class EnemyManager
 {
 public:
 
-	static constexpr int MAX_W = 30;
-	static constexpr int MAX_DILAY = 60;
+	static constexpr int MAX_W = 5;
+	static constexpr int MAX_DILAY = 30;
 
 	// 敵の生成ウェーブ
 	enum class WAVE

@@ -3,14 +3,13 @@
 #include "../Application.h"
 #include "../Utility/AsoUtility.h"
 #include "../Manager/SceneManager.h"
-#include "../Manager/ResourceManager.h"
 #include "../Manager/InputManager.h"
 #include "../Object/Timer/Timer.h"
 #include "ClearScene.h"
 
 ClearScene::ClearScene(Timer*timer)
 {
-		timer_ = timer;
+	timer_ = timer;
 }
 
 ClearScene::~ClearScene(void)
@@ -48,5 +47,6 @@ void ClearScene::Update(void)
 void ClearScene::Draw(void)
 {
 	DrawString(0, 100, "Clear Scene", 0x000000);
-	DrawString(0, 130, "スベース(Bボタン)でタイトル", 0x000000);
+	DrawString(0, 130, "スベース(Aボタン)でリスタート", 0x000000);
 }
+

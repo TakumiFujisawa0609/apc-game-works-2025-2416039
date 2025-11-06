@@ -332,6 +332,7 @@ void SceneManager::State(void)
 		}
 		if (manewSerect_ == MANEW_SERECT::EXIT)
 		{
+			timer_->ReStart();
 			manew_ = false;
 		}
 	}

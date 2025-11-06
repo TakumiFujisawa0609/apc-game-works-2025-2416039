@@ -45,7 +45,7 @@ public:
 	// 初期位置
 	static constexpr VECTOR DEFAULT_POS = { 300.0f, 10.0f, 300.0f };
 	// 標準の自己発光色
-	static constexpr COLOR_F COLOR_EMI_DEFAULT = { 0.5f, 0.5f, 0.5f, 0.5f };
+	static constexpr COLOR_F COLOR_EMI_DEFAULT = { 1.0f, 1.0f, 1.0f, 1.0f };
 	// 移動スピード
 	static constexpr float SPEED_MOVE = 10.0f;
 
@@ -79,6 +79,7 @@ private:
 	VECTOR shotPos_;
 
 	// 初期角度
+	VECTOR localAngles_;//ローカル回転
 	VECTOR angles_;
 	
 	// アニメーションコントローラー

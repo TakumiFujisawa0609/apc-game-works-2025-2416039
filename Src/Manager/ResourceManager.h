@@ -16,6 +16,7 @@ public:
 		EnemyW,
 		EFFCT1,
 		AVOID,
+		STAGE,
 	};
 
 	// 明示的にインステンスを生成する
