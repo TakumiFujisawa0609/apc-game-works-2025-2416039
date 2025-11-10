@@ -12,8 +12,9 @@ public:
 	// エネミー種別
 	enum class TYPE
 	{
-		WIZARD,
-
+		ENEMYM,
+		ENEMYR,
+		ENEMYU,
 	};
 
 
@@ -34,6 +35,7 @@ public:
 		NONE,
 		STANDBY,
 		ATTACK,
+		STAN,
 		HIT_REACT,
 		DEAD_REACT,
 		END,
@@ -47,7 +49,7 @@ public:
 	// 標準の自己発光色
 	static constexpr COLOR_F COLOR_EMI_DEFAULT = { 1.0f, 1.0f, 1.0f, 1.0f };
 	// 移動スピード
-	static constexpr float SPEED_MOVE = 10.0f;
+	static constexpr float SPEED_MOVE = 7.5f;
 
 	//アニメーションステージ
 	static constexpr float ANIM_STAGE = 1.0f;
@@ -72,21 +74,9 @@ private:
 
 	int invCnt_;
 
+	int stanCnt_;
 	
-	// 初期位置
-	
-	VECTOR pos_;
-	VECTOR shotPos_;
-
-	// 初期角度
-	VECTOR localAngles_;//ローカル回転
-	VECTOR angles_;
-	
-	// アニメーションコントローラー
-	//AnimationController* animationController_;
-
-	// 移動方向
-	VECTOR moveDir_;
+	bool isHit_;
 
 	// プレイヤーのポインタ
 	Player* player_;
@@ -113,12 +103,18 @@ public:
 
 	void LookPlayer(void);
 
+	void Move(void);
+	void AttackMove(void);
+
 	void SetSpaenPos(void);
 
 	void ChangeState(STATE state);
 
 	VECTOR GetPos(void);
 	void SetPos(VECTOR pos);
+
+	VECTOR GetAttackPos(void);
+	float GetAttackRadius(void);
 
 	float GetRadius(void);
 
@@ -130,12 +126,30 @@ public:
 
 	void Damage(int damage);
 
+	
+
 	bool IsCollisionState(void);
 
 	std::vector<ShotBase*> GetShot();
-protected:
+
+	STATE GetState();
+protected:// 初期位置
+	
+	VECTOR pos_;
+	VECTOR shotPos_;
+
+	// 初期角度
+	VECTOR localAngles_;//ローカル回転
+	VECTOR angles_;
+
+	// アニメーションコントローラー
+	//AnimationController* animationController_;
+
+	// 移動方向
+	VECTOR moveDir_;
 	// モデルの大きさ
 	VECTOR scales_;
+	VECTOR attackPos_;
 
 	int hp_;
 
@@ -144,6 +158,7 @@ protected:
 	float spaen_;
 
 	float cntAttack_;
+
 	// 移動速度
 	float moveSpeed_;
 
@@ -151,6 +166,7 @@ protected:
 
 	//当たり判定の半径
 	float collisionRadius_;
+	float attackRadius_;
 
 	// 弾
 	std::vector<ShotBase*> shots_;
@@ -170,23 +186,26 @@ protected:
 	// 状態遷移
 	virtual void ChangeStandby(void);
 	virtual void ChangeAttack(void);
+	virtual void ChangeStan(void);
 	virtual void ChangeHitReact();
 	virtual void ChangeDeadReact();
 	virtual void ChangeEnd();
 	// 状態別更新
 	virtual void UpdateStandby(void);
 	virtual void UpdateAttack(void);
+	virtual void UpdateStan(void);
 	virtual void UpdateHitReact();
 	virtual void UpdateDeadReact();
 	virtual void UpdateEnd();
 	// 状態別描画
 	virtual void DrawStandby(void);
 	virtual void DrawAttack(void);
+	virtual void DrawStan(void);
 	virtual void DrawHitReact();
 	virtual void DrawDeadReact();
 	virtual void DrawEnd();
 
-
+	
 
 };
 

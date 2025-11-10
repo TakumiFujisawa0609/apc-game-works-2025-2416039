@@ -81,7 +81,7 @@ void Application::Run(void)
 
 		sceneManager.Draw();
 		// •½‹ÏFPS•`‰æ
-		fpsController_->Draw();
+		//fpsController_->Draw();
 
 		ScreenFlip();
 		// —‘zFPSŒo‰ß‘Ò‚¿
@@ -108,7 +108,7 @@ void Application::Destroy(void)
 
 	delete instance_;
 	// FPS§Œäƒƒ‚ƒŠ‰ğ•ú
-	delete fpsController_;
+	//delete fpsController_;
 }
 
 bool Application::IsInitFail(void) const

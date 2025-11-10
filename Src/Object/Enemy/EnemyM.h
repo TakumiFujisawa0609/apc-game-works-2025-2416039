@@ -1,13 +1,13 @@
 #pragma once
 #include "EnemyBase.h"
-class EnemyWizard : public EnemyBase
+class EnemyM : public EnemyBase
 {
 public:
 	static constexpr int TERM_ATTACK = 120.0f;
 	// コンストラクタ
-	EnemyWizard(void);
+	EnemyM(void);
 	// デストラクタ
-	~EnemyWizard(void);
+	~EnemyM(void);
 private:
 
 protected:

@@ -143,13 +143,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Enemy\EnemyBase.h" />
+    <ClInclude Include="Src\Object\Enemy\EnemyR.h" />
+    <ClInclude Include="Src\Object\Enemy\EnemyU.h" />
     <ClInclude Include="Src\05_FPS制御\FpsController.h" />
     <ClInclude Include="Src\Manager\SoundManager.h" />
     <ClInclude Include="Src\Common\Quaternion.h" />
     <ClInclude Include="Src\Object\Collision\Collision.h" />
     <ClInclude Include="Src\Manager\EnemyManager.h" />
-    <ClInclude Include="Src\Object\Enemy\EnemyBase.h" />
-    <ClInclude Include="Src\Object\Enemy\EnemyWizard.h" />
+    <ClInclude Include="Src\Object\Player\EnemyBase.h" />
+    <ClInclude Include="Src\Object\Enemy\EnemyM.h" />
     <ClInclude Include="Src\Object\Player\Player.h" />
     <ClInclude Include="Src\Application.h" />
     <ClInclude Include="Src\Common\Fader.h" />
@@ -177,13 +180,15 @@
     <ClInclude Include="Src\Object\Stage\Stage.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Enemy\EnemyR.cpp" />
+    <ClCompile Include="Src\Object\Enemy\EnemyU.cpp" />
     <ClCompile Include="Src\05_FPS制御\FpsController.cpp" />
     <ClCompile Include="Src\Manager\SoundManager.cpp" />
     <ClCompile Include="Src\Common\Quaternion.cpp" />
     <ClCompile Include="Src\Object\Collision\Collision.cpp" />
     <ClCompile Include="Src\Manager\EnemyManager.cpp" />
     <ClCompile Include="Src\Object\Enemy\EnemyBase.cpp" />
-    <ClCompile Include="Src\Object\Enemy\EnemyWizard.cpp" />
+    <ClCompile Include="Src\Object\Enemy\EnemyM.cpp" />
     <ClCompile Include="Src\Object\Player\Player.cpp" />
     <ClCompile Include="Src\Application.cpp" />
     <ClCompile Include="Src\Common\Fader.cpp" />

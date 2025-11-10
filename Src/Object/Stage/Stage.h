@@ -15,7 +15,8 @@ public:
 	void Update();
 	void Draw();
 
-
+	VECTOR GetPos() { return pos_; }
+	float GetRadius() { return radius_; }
 
 private:
 	
@@ -24,6 +25,6 @@ private:
 	VECTOR localRot_;
 	VECTOR rot_;
 	VECTOR scl_;
-
+	float radius_;
 };
 

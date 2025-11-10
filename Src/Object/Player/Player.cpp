@@ -30,7 +30,7 @@ void Player::Init(Camera* camera, GameScene* game)
 	ResourceManager& res = ResourceManager::GetInstance(); // リソースマネージャのインスタンス取得
 
 	
-	model_ = res.Load(ResourceManager::SRC::PlayerModel).handleId_;
+	model_ = res.Load(ResourceManager::SRC::PLAYER).handleId_;
 
 	avoidSE_ = res.Load(ResourceManager::SRC::AVOID).handleId_;
 
@@ -58,6 +58,8 @@ void Player::Init(Camera* camera, GameScene* game)
 	// 無敵カウント
 	invCnt_ = 0;
 
+	attackCnt_ = 0.0f;
+
 	// モデルの自己発光色設定
 	MV1SetMaterialEmiColor(model_, 0, COLOR_EMI_DEFAULT);
 
@@ -81,6 +83,9 @@ void Player::ChangeGuard()
 void Player::ChangeParry()
 {
 	parryCount_ = 0.0f;
+}
+void Player::ChangeAttack()
+{
 }
 void Player::ChangeDamage()
 {
@@ -107,6 +112,10 @@ void Player::Update()
 	case Player::STATE::PARRY:
 		ParryUpdate();
 		break;
+	case Player::STATE::ATTACK:
+		AttackUpdate();
+		break;
+
 	case Player::STATE::DAMAGE:
 		DamageUpdate();
 		break;
@@ -117,6 +126,8 @@ void Player::Update()
 		break;
 	}
 	MV1SetPosition(model_, pos_);
+	VECTOR localPos = { 0.0f, 0.0f, -ATTACK_RADIUS * 2 };
+	attackPos_ = VAdd(pos_, VTransform(localPos, MatrixUtility::Multiplication(localrot_, rot_)));
 	// 行列の合成(子, 親と指定すると親⇒子の順に適用される)
 	MATRIX mat = MatrixUtility::Multiplication(localrot_, rot_);
 	// 回転行列をモデルに反映
@@ -176,6 +187,10 @@ void Player::StandbyUpdate()
 		gp_ += 1.0f;
 	}
 
+	if (ins.IsTrgDown(KEY_INPUT_K) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::LEFT))
+	{
+		ChangeState(STATE::ATTACK);
+	}
 
 }
 
@@ -223,6 +238,16 @@ void Player::ParryUpdate()
 		ChangeState(STATE::STANDBY);
 	}
 	
+}
+void Player::AttackUpdate()
+{
+	
+	attackCnt_ += 1.0f;
+	if (attackCnt_ >= MAX_ATTACK_COUNT)
+	{
+		attackCnt_ = 0.0f;
+		ChangeState(STATE::STANDBY);
+	}
 }
 void Player::DamageUpdate()
 {
@@ -291,6 +316,9 @@ void Player::Draw()
 	case Player::STATE::PARRY:
 		ParryDraw();
 		break;
+	case Player::STATE::ATTACK:
+		AttackDraw();
+		break;
 	case Player::STATE::DAMAGE:
 		DamageDraw();
 		break;
@@ -315,31 +343,60 @@ void Player::Draw()
 void Player::StandbyDraw()
 {
 	MV1DrawModel(model_);
+#ifdef _DEBUG
 	DrawSphere3D(pos_, DAMAGE_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
-
-	collisionRadius_ = DAMAGE_RADIUS;
+#endif
+	collisionRadiusH_ = DAMAGE_RADIUS;
 }
 
 void Player::AvoidDraw()
 {
 	MV1DrawModel(model_);
-	DrawSphere3D(pos_, AVOID_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
-
-	collisionRadius_ = AVOID_RADIUS;
+#ifdef _DEBUG
+	DrawSphere3D(pos_, DAMAGE_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 / 2);
+	DrawSphere3D(pos_, AVOID_RADIUS, TEN + SIX, 0x00ff00, 0x00ff00, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+#endif
+	collisionRadiusGS_ = AVOID_RADIUS;
 }
 
 void Player::GuardDraw()
 {
-	DrawSphere3D(pos_, GUARD_RADIUS, TEN+SIX, 0x0000ff, 0x0000ff, false);
-	collisionRadius_ = GUARD_RADIUS;
+
 	MV1DrawModel(model_);
+#ifdef _DEBUG
+	DrawSphere3D(pos_, DAMAGE_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
+#endif
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 / 2);
+	DrawSphere3D(pos_, GUARD_RADIUS, TEN+SIX, 0x0000ff, 0x0000ff, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	collisionRadiusGS_ = GUARD_RADIUS;
+	
 }
 
 void Player::ParryDraw()
 {
-	DrawSphere3D(pos_, PARRY_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
-	collisionRadius_ = PARRY_RADIUS;
 	MV1DrawModel(model_);
+#ifdef _DEBUG
+	DrawSphere3D(pos_, DAMAGE_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
+#endif
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 / 2);
+	DrawSphere3D(pos_, PARRY_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	collisionRadiusGS_ = PARRY_RADIUS;
+	
+}
+
+void Player::AttackDraw()
+{
+	MV1DrawModel(model_);
+#ifdef _DEBUG
+	DrawSphere3D(pos_, DAMAGE_RADIUS, TEN + SIX, 0x0000ff, 0x0000ff, false);
+#endif
+
+	DrawSphere3D(attackPos_, ATTACK_RADIUS, TEN + SIX, 0xff0000, 0xff0000, true);
+	
 }
 
 void Player::DamageDraw()
@@ -369,6 +426,9 @@ void Player::ChangeState(STATE state)
 		break;
 	case Player::STATE::PARRY:
 		ChangeParry();
+		break;
+	case Player::STATE::ATTACK:
+		ChangeAttack();
 		break;
 	case Player::STATE::DAMAGE:
 		ChangeDamage();
@@ -558,28 +618,20 @@ void Player::AvoidMove()
 bool Player::IsCollisionState(void)
 {
 	// プレイヤーの状態が衝突判定を行う状態かどうか
-	if (state_ == STATE::STANDBY || state_ == STATE::AVOID||state_==STATE::GUARD||state_==STATE::PARRY)
+	if (state_ == STATE::STANDBY || state_ == STATE::AVOID||state_==STATE::GUARD||state_==STATE::PARRY || state_ == STATE::ATTACK)
 	{
 		return true;
 	}
 	return false;
 }
 
-void Player::Hit(bool is)
+void Player::HitGS(bool is)
 {
 	bool isHit = false;
 	isHit = is;
 
 	if (isHit)
 	{
-		if(state_==STATE::STANDBY)
-		{
-
-			ChangeState(STATE::DAMAGE);
-			hp_ -= LOST_HP;
-			isAlive_ = false;
-			isHit = false;
-		}
 
 		if (state_ == STATE::GUARD)
 		{
@@ -609,6 +661,17 @@ void Player::Hit(bool is)
 
 }
 
+void Player::HitH(bool is)
+{
+	bool isHit = false;
+	isHit = is;
+
+	if (isHit)
+	{
+		hp_ -= LOST_HP;
+	}
+}
+
 
 void Player::DelayRotate(void)
 {
@@ -627,6 +690,16 @@ VECTOR Player::GetPos()
 void Player::SetPos(VECTOR pos)
 {
 	pos_ = pos;
+}
+
+VECTOR Player::GetAttackPos()
+{
+	return attackPos_;
+}
+
+VECTOR Player::GetRot()
+{
+	return attackPos_;
 }
 
 
@@ -665,8 +738,16 @@ Player::STATE Player::GetState()
 	return state_;
 }
 
-float Player::GetCollisionRadius()
+float Player::GetCollisionRadiusGS()
 {
-	return collisionRadius_;
+	return collisionRadiusGS_;
+}
+float Player::GetCollisionRadiusH()
+{
+	return collisionRadiusH_;
 }
 
+float Player::GetAttackRange()
+{
+	return ATTACK_RADIUS;
+}

@@ -48,6 +48,6 @@ void TitleScene::Update(void)
 void TitleScene::Draw(void)
 {
 	DrawString(0, 100, "Title Scene", 0x000000);
-	DrawString(0, 130, "スベース(Bボタン)でゲームスタート", 0x000000);
+	DrawString(0, 130, "スベース(Aボタン)でゲームスタート", 0x000000);
 }
 

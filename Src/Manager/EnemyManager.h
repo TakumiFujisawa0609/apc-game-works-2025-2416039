@@ -9,8 +9,10 @@ class EnemyManager
 {
 public:
 
-	static constexpr int MAX_W = 5;
+	static constexpr int MAX_W = 2;
 	static constexpr int MAX_DILAY = 30;
+
+
 
 	// 敵の生成ウェーブ
 	enum class WAVE
@@ -43,7 +45,13 @@ private:
 
 	int sponCuntW_;
 
-	int sponDilay_;
+	int sponDilayM_;
+
+	int sponR_;
+	int sponDilayR_;
+	
+	int sponU_;
+	int sponDilayU_;
 
 	// エネミー用のモデルハンドルID
 	std::vector<int> enemyModelIds_;

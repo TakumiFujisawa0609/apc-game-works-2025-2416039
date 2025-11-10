@@ -34,6 +34,10 @@ void EnemyBase::Init(TYPE type, int baseModelId, int baseAttackEffectModelId, Pl
 	// エフェクトモデルID
 	baseAttackEffectModelId_ = baseAttackEffectModelId;
 
+	stanCnt_ = 0;
+
+	isHit_ = false;
+
 	//パラメータ設定
 	SetParam();
 
@@ -55,6 +59,8 @@ void EnemyBase::Init(TYPE type, int baseModelId, int baseAttackEffectModelId, Pl
 
 void EnemyBase::Update(void)
 {
+
+
 	switch (state_)
 	{
 	case EnemyBase::STATE::STANDBY:
@@ -62,6 +68,9 @@ void EnemyBase::Update(void)
 		break;
 	case EnemyBase::STATE::ATTACK:
 		UpdateAttack();
+		break;
+	case EnemyBase::STATE::STAN:
+		UpdateStan();
 		break;
 	case EnemyBase::STATE::HIT_REACT:
 		UpdateHitReact();
@@ -73,6 +82,10 @@ void EnemyBase::Update(void)
 		UpdateEnd();
 		break;
 	}
+
+	VECTOR localPos = { 0.0f, 80.0f, 120 };
+	attackPos_ = VAdd(pos_, VTransform(localPos, MatrixUtility::Multiplication(localAngles_, angles_)));
+
 	UpdateShot();
 	//animationController_->Update();
 }
@@ -110,6 +123,9 @@ void EnemyBase::Draw(void)
 		break;
 	case EnemyBase::STATE::HIT_REACT:
 		DrawHitReact();
+		break;
+	case EnemyBase::STATE::STAN:
+		DrawStan();
 		break;
 	case EnemyBase::STATE::DEAD_REACT:
 		DrawDeadReact();
@@ -158,6 +174,18 @@ void EnemyBase::LookPlayer(void)
 	MV1SetScale(modelId_, scales_);
 }
 
+void EnemyBase::Move()
+{
+	pos_ = VAdd(pos_, VScale(moveDir_, SPEED_MOVE));
+	MV1SetPosition(modelId_, pos_);
+}
+
+void EnemyBase::AttackMove(void)
+{
+	pos_ = VAdd(pos_, VScale(moveDir_, SPEED_MOVE*3));
+	MV1SetPosition(modelId_, pos_);
+}
+
 void EnemyBase::SetSpaenPos(void)
 {
 	//半径をとる
@@ -202,6 +230,10 @@ void EnemyBase::ChangeState(STATE state)
 	case EnemyBase::STATE::ATTACK:
 		ChangeAttack();
 		break;
+	case EnemyBase::STATE::STAN:
+		ChangeStan();
+		break;
+
 	case EnemyBase::STATE::HIT_REACT:
 		ChangeHitReact();
 		break;
@@ -222,6 +254,16 @@ VECTOR EnemyBase::GetPos(void)
 void EnemyBase::SetPos(VECTOR pos)
 {
 	pos_ = pos;
+}
+
+VECTOR EnemyBase::GetAttackPos(void)
+{
+	return attackPos_;
+}
+
+float EnemyBase::GetAttackRadius(void)
+{
+	return attackRadius_;
 }
 
 float EnemyBase::GetRadius(void)
@@ -267,7 +309,7 @@ void EnemyBase::Damage(int damage)
 
 bool EnemyBase::IsCollisionState(void)
 {
-	if (state_ == STATE::STANDBY || state_ == STATE::ATTACK)
+	if (state_ == STATE::STANDBY || state_ == STATE::ATTACK|| state_ == STATE::STAN)
 	{
 		return true;
 	}
@@ -277,6 +319,11 @@ bool EnemyBase::IsCollisionState(void)
 std::vector<ShotBase*> EnemyBase::GetShot()
 {
 	return shots_;
+}
+
+EnemyBase::STATE EnemyBase::GetState()
+{
+	return state_;
 }
 
 void EnemyBase::UpdateShot(void)
@@ -336,7 +383,7 @@ void EnemyBase::ChangeAttack(void)
 	// 攻撃間隔用のカウンタをリセット
 	cntAttack_ = 0;
 	// 弾を生成
-	if (type_ == TYPE::WIZARD)
+	if (type_ == TYPE::ENEMYM|| type_ == TYPE::ENEMYR)
 	{
 		ShotBase* shot = GetValidShot();
 		// 弾を生成
@@ -348,6 +395,10 @@ void EnemyBase::ChangeAttack(void)
 
 		shot->CreateShot(shotPos_, moveDir_);
 	}
+}
+
+void EnemyBase::ChangeStan(void)
+{
 }
 
 void EnemyBase::ChangeHitReact()
@@ -372,6 +423,20 @@ void EnemyBase::UpdateStandby(void)
 void EnemyBase::UpdateAttack(void)
 {
 	ChangeState(STATE::STANDBY);
+}
+
+void EnemyBase::UpdateStan(void)
+{
+	stanCnt_++;
+	if (stanCnt_ <= 600)
+	{
+		return;
+	}
+	else
+	{
+		stanCnt_ = 0;
+		ChangeState(STATE::STANDBY);
+	}
 }
 
 void EnemyBase::UpdateHitReact()
@@ -412,6 +477,13 @@ void EnemyBase::DrawAttack(void)
 {
 	// モデルの描画
 	MV1DrawModel(modelId_);
+	//DrawSphere3D(attackPos_, attackRadius_, 16, 0xff0000, 0xff0000, false);
+}
+
+void EnemyBase::DrawStan(void)
+{
+	// モデルの描画
+	MV1DrawModel(modelId_);
 }
 
 void EnemyBase::DrawHitReact()
@@ -430,3 +502,6 @@ void EnemyBase::DrawEnd()
 	// モデルの描画
 	MV1DrawModel(modelId_);
 }
+
+
+

@@ -12,8 +12,10 @@ public:
 	// ÉäÉ\Å[ÉXñº
 	enum class SRC
 	{
-		PlayerModel,
-		EnemyW,
+		PLAYER,
+		ENEMYM,
+		ENEMYR,
+		ENEMYU,
 		EFFCT1,
 		AVOID,
 		STAGE,

@@ -34,9 +34,16 @@ void ResourceManager::Init(void)
 
 	//モデル
 	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Player/無題.mv1");
-	resourcesMap_.emplace(SRC::PlayerModel, std::move(res));
+	resourcesMap_.emplace(SRC::PLAYER, std::move(res));
 	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Enemy/minigann.mv1");
-	resourcesMap_.emplace(SRC::EnemyW, std::move(res));
+	resourcesMap_.emplace(SRC::ENEMYM, std::move(res));
+
+	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Enemy/usi.mv1");
+	resourcesMap_.emplace(SRC::ENEMYU, std::move(res));
+
+	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Enemy/ranntya.mv1");
+	resourcesMap_.emplace(SRC::ENEMYR, std::move(res));
+
 	//エフェクト
 	res = std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Effect/Fireball.mv1");
 	resourcesMap_.emplace(SRC::EFFCT1, std::move(res));

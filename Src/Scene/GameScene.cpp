@@ -48,7 +48,7 @@ void GameScene::Init(void)
 	grid_->Init();
 	player_->Init(camera_,this);
 	enemyManager_->Init();
-	collision_->Init(player_,enemyManager_);
+	collision_->Init(player_,enemyManager_,this,stage_);
 	stage_->Init();
 
 
@@ -92,8 +92,7 @@ void GameScene::Update(void)
 	}
 	
 	
-
-
+	
 	collision_->Update();
 	// シーン遷移
 	if (ins.IsTrgDown(KEY_INPUT_R)||ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::BACK))
@@ -107,11 +106,12 @@ void GameScene::Update(void)
 
 	if (count_ > MAX_COUNT)
 	{
+		
 		if (timer_->GetMin() <= 0 && timer_->GetSec() <= 0)
 		{
 			SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::CLEAR);
 		}
-		count_ = MAX_COUNT + 1;
+		
 	}
 }
 
@@ -120,10 +120,11 @@ void GameScene::Draw(void)
 	// カメラ設定
 	camera_->SetBeforeDraw();
 	//グリッド線
-	grid_->Draw();
+	//grid_->Draw();
+	stage_->Draw();
 	//プレイヤー
 	player_->Draw();
-	stage_->Draw();
+	
 	//エネミー
 	enemyManager_->Draw();
 
@@ -135,6 +136,11 @@ void GameScene::Draw(void)
 void GameScene::SetIsSlow(bool isSlow)
 {
 	isSlow_ = isSlow;
+}
+
+bool GameScene::GetIsSlow(void)
+{
+	return isSlow_;
 }
 
 

@@ -13,6 +13,7 @@ public:
 		AVOID,
 		GUARD,
 		PARRY,
+		ATTACK,
 		DAMAGE,
 		DEAD,
 
@@ -51,11 +52,13 @@ public:
 	static constexpr float MAX_GP = 100; //最大ガード
 	static constexpr float MAX_PARRY_COUNT = 5.0f; //カウントの最大値
 	static constexpr float MAX_AVOID_DELAY = 3.0f;//回避遅延
+	static constexpr float MAX_ATTACK_COUNT = 10.0f;//攻撃カウントの最大値
 	
 	static constexpr float DAMAGE_RADIUS = 60.0f;//ダメージ時の半径
 	static constexpr float AVOID_RADIUS = 80.0f;//回避時の半径
 	static constexpr float GUARD_RADIUS = 100.0f;//ガード時の半径
 	static constexpr float PARRY_RADIUS = 120.0f;//パリィ時の半径
+	static constexpr float ATTACK_RADIUS = 60.0f;//攻撃範囲
 
 	// 標準の自己発光色
 	static constexpr COLOR_F COLOR_EMI_DEFAULT = { 0.5f, 0.5f, 0.5f, 0.5f };
@@ -63,6 +66,7 @@ private:
 
 	int model_;//モデル
 	VECTOR pos_;//位置
+	VECTOR attackPos_;//攻撃位置
 	VECTOR rot_;//回転
 	VECTOR localrot_;//ローカル回転
 	VECTOR scale_;//大きさ
@@ -73,10 +77,14 @@ private:
 	VECTOR moveDir_;//移動方向
 	bool isAlive_;//生存フラグ
 	int invCnt_;//無敵カウント
-	float parryCount_;
-	bool trgAvoid_;
-	float avoidDelay_;
-	float collisionRadius_;//当たり判定用半径
+	float parryCount_;//パリィ受付時間
+	float attackCnt_;//攻撃受付時間
+	bool trgAvoid_;//回避トリガー
+	float avoidDelay_;//回避再使用時間
+	float collisionRadiusGS_;//当たり判定用半径
+	float collisionRadiusH_;//当たり判定用半径
+	float attackRange_;//攻撃範囲
+
 
 	//SE
 	int avoidSE_;
@@ -96,6 +104,7 @@ public:
 	void ChangeAvoid();
 	void ChangeGuard();
 	void ChangeParry();
+	void ChangeAttack();
 	void ChangeDamage();
 	void ChangeDead();
 
@@ -106,6 +115,7 @@ public:
 	void AvoidUpdate();
 	void GuardUpdate();
 	void ParryUpdate();
+	void AttackUpdate();
 	void DamageUpdate();
 	void DeadUpdate();
 
@@ -116,6 +126,7 @@ public:
 	void AvoidDraw();
 	void GuardDraw();
 	void ParryDraw();
+	void AttackDraw();
 	void DamageDraw();
 	void DeadDraw();
 
@@ -127,12 +138,16 @@ public:
 	void HalfMove();
 	void AvoidMove();
 	bool IsCollisionState(void);
-	void Hit(bool is);
-	
+	void HitGS(bool is);
+	void HitH(bool is);
+
 
 	//ゲッターセッター
 	VECTOR GetPos();
 	void SetPos(VECTOR pos);
+	VECTOR GetAttackPos();
+
+	VECTOR GetRot();
 	int GetHp();
 	void SetHp(int hp);
 	int GetSp();
@@ -140,8 +155,9 @@ public:
 	int GetGp();
 	void SetGp(int gp);
 	STATE GetState();
-	float GetCollisionRadius();
-
+	float GetCollisionRadiusGS();
+	float GetCollisionRadiusH();
+	float GetAttackRange();
 
 	void DelayRotate();
 };

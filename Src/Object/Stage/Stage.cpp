@@ -26,7 +26,7 @@ void Stage::Init()
 	localRot_ = {0.0f,0.0f,0.0f};
 	rot_ = {0.0f,0.0f,0.0f};
 	scl_ = {3.0f,3.0f,3.0f};
-
+	radius_ = 2500.0f;
 	MV1SetPosition(model_, pos_);
 	MV1SetRotationMatrix(model_, MatrixUtility::Multiplication(localRot_, rot_));
 	MV1SetScale(model_, scl_);
@@ -42,4 +42,5 @@ void Stage::Update()
 void Stage::Draw()
 {
 	MV1DrawModel(model_);
+	//DrawSphere3D(pos_, radius_, 16, 0x00FF00FF, 0x0000FFFF, false);
 }

@@ -30,6 +30,7 @@ public:
 	void Draw(void) override;
 
 	void SetIsSlow(bool isSlow);
+	bool GetIsSlow(void);
 
 private:
 

@@ -1,14 +1,14 @@
-#include "EnemyWizard.h"
+#include "EnemyM.h"
 
-EnemyWizard::EnemyWizard(void)
+EnemyM::EnemyM(void)
 {
 }
 
-EnemyWizard::~EnemyWizard(void)
+EnemyM::~EnemyM(void)
 {
 }
 
-void EnemyWizard::SetParam(void)
+void EnemyM::SetParam(void)
 {
 	hp_ = 1;
 	scales_ = { 0.5f, 0.5f, 0.5f };
@@ -19,7 +19,7 @@ void EnemyWizard::SetParam(void)
 	isAlive_ = true;
 }
 
-void EnemyWizard::UpdateStandby(void)
+void EnemyM::UpdateStandby(void)
 {
 	LookPlayer();
 
