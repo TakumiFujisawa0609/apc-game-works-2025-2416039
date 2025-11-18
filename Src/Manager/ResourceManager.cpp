@@ -50,6 +50,19 @@ void ResourceManager::Init(void)
 
 	res = std::make_unique<RES>(RES_T::SOUND, PATH_SND + "SE/‰ñ”ğ.mp3");
 	resourcesMap_.emplace(SRC::AVOID, std::move(res));
+	res = std::make_unique<RES>(RES_T::SOUND, PATH_SND + "SE/AS_846334_–‚–@‰¹.mp3");
+	resourcesMap_.emplace(SRC::SLOU, std::move(res));
+	res = std::make_unique<RES>(RES_T::SOUND, PATH_SND + "SE/Œ•‚Å‘Å‚¿‡‚¤3.mp3");
+	resourcesMap_.emplace(SRC::PARRY, std::move(res));
+	res = std::make_unique<RES>(RES_T::SOUND, PATH_SND + "SE/‚‚Å–hŒä.mp3");
+	resourcesMap_.emplace(SRC::GUARD, std::move(res));
+	res = std::make_unique<RES>(RES_T::SOUND, PATH_SND + "SE/“‚Åa‚é2.mp3");
+	resourcesMap_.emplace(SRC::HIT, std::move(res));
+	res = std::make_unique<RES>(RES_T::SOUND, PATH_SND + "SE/AS_778954_ƒLƒ“-ƒ‚ƒmƒ‰ƒ‹iŒ•‚Ì“–‚½‚é‰¹jUŒ‚E–hŒä_Audio Trimmer.mp3");
+	resourcesMap_.emplace(SRC::NODAME, std::move(res));
+	res = std::make_unique<RES>(RES_T::SOUND, PATH_SND + "SE/AS_221787_aŒ‚Eh‚·4E‘„‚âŒ•_Audio Trimmer.mp3");
+	resourcesMap_.emplace(SRC::DAMAGE, std::move(res));
+
 
 	res =std::make_unique<RES>(RES_T::MODEL, PATH_MDL + "Stage/Stage.mv1");
 	resourcesMap_.emplace(SRC::STAGE, std::move(res));

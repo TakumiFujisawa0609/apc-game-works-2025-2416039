@@ -33,6 +33,9 @@ void Player::Init(Camera* camera, GameScene* game)
 	model_ = res.Load(ResourceManager::SRC::PLAYER).handleId_;
 
 	avoidSE_ = res.Load(ResourceManager::SRC::AVOID).handleId_;
+	parrySE_ = res.Load(ResourceManager::SRC::PARRY).handleId_;
+	guardSE_ = res.Load(ResourceManager::SRC::GUARD).handleId_;
+	slouSE_ = res.Load(ResourceManager::SRC::SLOU).handleId_;
 
 	// ‰ŠúˆÊ’u
 	pos_ = { 0.0f, 50.0f, 0.0f };
@@ -148,10 +151,10 @@ void Player::StandbyUpdate()
 		if (ins.IsTrgDown(KEY_INPUT_LSHIFT)|| ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 		{
 			
-			auto& ins = SoundManager::GetInstance();
+			
 			
 			trgAvoid_ = true;
-			
+			auto& ins = SoundManager::GetInstance();
 			ins.PlaySE(avoidSE_);
 			
 		}
@@ -187,7 +190,7 @@ void Player::StandbyUpdate()
 		gp_ += 1.0f;
 	}
 
-	if (ins.IsTrgDown(KEY_INPUT_K) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::LEFT))
+	if (ins.IsTrgDown(KEY_INPUT_K) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::RIGHT))
 	{
 		ChangeState(STATE::ATTACK);
 	}
@@ -256,7 +259,7 @@ void Player::DamageUpdate()
 	DelayRotate();
 	if (sp_ > LOST_SP)
 	{
-
+		sp_ -= LOST_SP;
 		if (ins.IsTrgDown(KEY_INPUT_LSHIFT) || ins.IsPadBtnTrgDown(InputManager::JOYPAD_NO::PAD1, InputManager::JOYPAD_BTN::DOWN))
 		{
 			AvoidMove();
@@ -636,10 +639,13 @@ void Player::HitGS(bool is)
 		if (state_ == STATE::GUARD)
 		{
 			gp_-=LOST_GP;
-			
+			auto& ins = SoundManager::GetInstance();
+			ins.PlaySE(guardSE_);
 		}
 		if (state_ == STATE::PARRY)
 		{
+			auto& ins = SoundManager::GetInstance();
+			ins.PlaySE(parrySE_);
 			gp_ += 10.0f;
 			if (gp_ > MAX_GP)
 			{
@@ -654,6 +660,8 @@ void Player::HitGS(bool is)
 				
 				return;
 			}
+			auto& ins = SoundManager::GetInstance();
+			ins.PlaySE(slouSE_);
 			sp_ -= LOST_SP;
 			game_->SetIsSlow(true);
 		}

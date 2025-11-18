@@ -18,6 +18,14 @@ public:
 		ENEMYU,
 		EFFCT1,
 		AVOID,
+		SLOU,
+		ATTACK,
+		PARRY,
+		BREAK,
+		GUARD,
+		NODAME,
+		DAMAGE,
+		HIT,
 		STAGE,
 	};
 

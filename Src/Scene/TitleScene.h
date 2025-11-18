@@ -8,6 +8,9 @@ class TitleScene : public SceneBase
 
 public:
 
+
+
+
 	// コンストラクタ
 	TitleScene(void);
 
@@ -20,6 +23,6 @@ public:
 
 private:
 	int count_;
+	bool sousa_;
 	
-
 };

@@ -6,7 +6,7 @@ class EnemyU: public EnemyBase
 {
 public:
 	static constexpr int TERM_ATTACK = 120.0f;
-	static constexpr int ATTACK_CNT_MAX = 60;
+	static constexpr int ATTACK_CNT_MAX = 120;
 	// コンストラクタ
 	EnemyU(void);
 	// デストラクタ

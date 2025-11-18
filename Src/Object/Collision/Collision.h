@@ -26,5 +26,9 @@ private:
 	GameScene* game_;
 	Stage* stage_;
 
+	int noDamageSE_;
+	int DamageSE_;
+	int HitSE_;
+
 };
 

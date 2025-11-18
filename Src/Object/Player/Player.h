@@ -88,7 +88,9 @@ private:
 
 	//SE
 	int avoidSE_;
-
+	int parrySE_;
+	int guardSE_;
+	int slouSE_;
 
 	Camera* camera_;
 

@@ -53,6 +53,12 @@ private:
 	int sponU_;
 	int sponDilayU_;
 
+	WAVE wave_;
+
+	int waveCount_;
+
+	
+
 	// エネミー用のモデルハンドルID
 	std::vector<int> enemyModelIds_;
 

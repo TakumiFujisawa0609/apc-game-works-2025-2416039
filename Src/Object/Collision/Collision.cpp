@@ -1,6 +1,7 @@
 
 #include <DxLib.h>
-
+#include "../../Manager/ResourceManager.h"
+#include "../../Manager/SoundManager.h"
 #include "../../Manager/EnemyManager.h"
 #include "../../Object/Player/Player.h"
 #include "../../Object/Enemy/EnemyBase.h"
@@ -22,10 +23,16 @@ Collision::~Collision()
 
 void Collision::Init(Player* player, EnemyManager* enemyManager,GameScene*game,Stage*stage)
 {
+	ResourceManager& res = ResourceManager::GetInstance(); // リソースマネー
+	DamageSE_ = res.Load(ResourceManager::SRC::DAMAGE).handleId_;
+	HitSE_ = res.Load(ResourceManager::SRC::HIT).handleId_;
+	noDamageSE_ = res.Load(ResourceManager::SRC::NODAME).handleId_;
+
 	player_ = player;
 	enemyManager_ = enemyManager;
 	game_ = game;
 	stage_ = stage;
+
 }
 
 void Collision::Update(void)
